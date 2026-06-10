@@ -34,8 +34,7 @@ jobs:
       - name: Install StreamTask starter
         working-directory: StreamTask
         run: |
-          chmod +x mvnw
-          ./mvnw -B -pl stream-task-spring-boot-starter -am -DskipTests install
+          mvn -B -pl stream-task-spring-boot-starter -am -DskipTests install
 
       - name: Run tests
         run: |
