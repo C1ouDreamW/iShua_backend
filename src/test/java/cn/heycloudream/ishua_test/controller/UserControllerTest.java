@@ -27,6 +27,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -75,8 +76,7 @@ class UserControllerTest {
     @Test
     @DisplayName("POST /register/email-code: 成功 → code=200")
     void sendRegisterEmailCode_success_shouldReturn200() throws Exception {
-        UserRegisterEmailCodeDTO dto = new UserRegisterEmailCodeDTO();
-        dto.setEmail("user@example.com");
+        UserRegisterEmailCodeDTO dto = buildValidEmailCodeDto();
 
         mockMvc.perform(post("/api/v1/users/register/email-code")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -84,18 +84,36 @@ class UserControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.code").value(200));
 
-        verify(registerEmailVerificationService).sendCode("user@example.com");
+        verify(registerEmailVerificationService).sendCode(
+                eq("user@example.com"),
+                eq("turnstile-token"),
+                any());
+    }
+
+    @Test
+    @DisplayName("POST /register/email-code: 人机验证失败 → code=400")
+    void sendRegisterEmailCode_turnstileFailed_shouldReturn400() throws Exception {
+        UserRegisterEmailCodeDTO dto = buildValidEmailCodeDto();
+
+        doThrow(new BusinessException(400, "人机验证失败，请重试"))
+                .when(registerEmailVerificationService)
+                .sendCode(eq("user@example.com"), eq("turnstile-token"), any());
+
+        mockMvc.perform(post("/api/v1/users/register/email-code")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(dto)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.code").value(400));
     }
 
     @Test
     @DisplayName("POST /register/email-code: 频控 → code=429")
     void sendRegisterEmailCode_rateLimited_shouldReturn429() throws Exception {
-        UserRegisterEmailCodeDTO dto = new UserRegisterEmailCodeDTO();
-        dto.setEmail("user@example.com");
+        UserRegisterEmailCodeDTO dto = buildValidEmailCodeDto();
 
         doThrow(new BusinessException(429, "验证码发送过于频繁，请稍后再试"))
                 .when(registerEmailVerificationService)
-                .sendCode("user@example.com");
+                .sendCode(eq("user@example.com"), eq("turnstile-token"), any());
 
         mockMvc.perform(post("/api/v1/users/register/email-code")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -206,6 +224,13 @@ class UserControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.code").value(200))
                 .andExpect(jsonPath("$.data.userId").value(1));
+    }
+
+    private static UserRegisterEmailCodeDTO buildValidEmailCodeDto() {
+        UserRegisterEmailCodeDTO dto = new UserRegisterEmailCodeDTO();
+        dto.setEmail("user@example.com");
+        dto.setTurnstileToken("turnstile-token");
+        return dto;
     }
 
     private static UserRegisterDTO buildValidRegisterDto() {

@@ -25,4 +25,7 @@ public final class ValidationConstants {
     public static final int AUTH_EMAIL_CODE_MAX_ATTEMPTS = 5;
     public static final int AUTH_EMAIL_CODE_TTL_SECONDS = 10 * 60;
     public static final int AUTH_EMAIL_CODE_RESEND_COOLDOWN_SECONDS = 60;
+
+    public static final int TURNSTILE_TOKEN_MAX_LENGTH = 2048;
+    public static final String TURNSTILE_ACTION_REGISTER_EMAIL_CODE = "register_email_code";
 }

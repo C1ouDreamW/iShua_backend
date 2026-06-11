@@ -3,6 +3,7 @@ package cn.heycloudream.ishua_backend.service.email;
 import cn.heycloudream.ishua_backend.common.constants.IShuaRedisCacheConstants;
 import cn.heycloudream.ishua_backend.common.constants.ValidationConstants;
 import cn.heycloudream.ishua_backend.exception.BusinessException;
+import cn.heycloudream.ishua_backend.service.turnstile.TurnstileVerificationService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -19,8 +20,11 @@ public class RegisterEmailVerificationService {
 
     private final StringRedisTemplate stringRedisTemplate;
     private final RegisterEmailSender registerEmailSender;
+    private final TurnstileVerificationService turnstileVerificationService;
 
-    public void sendCode(String email) {
+    public void sendCode(String email, String turnstileToken, String clientIp) {
+        turnstileVerificationService.verifyRegisterEmailCode(turnstileToken, clientIp);
+
         String normalizedEmail = normalizeEmail(email);
         String cooldownKey = IShuaRedisCacheConstants.registerEmailCodeCooldownKey(normalizedEmail);
         Boolean allowed = stringRedisTemplate.opsForValue()

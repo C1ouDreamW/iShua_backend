@@ -19,4 +19,9 @@ public class UserRegisterEmailCodeDTO {
     @Email(message = "邮箱格式不正确")
     @Size(max = ValidationConstants.AUTH_EMAIL_MAX, message = "邮箱长度不能超过254")
     private String email;
+
+    @Schema(description = "Cloudflare Turnstile 令牌", example = "0.abcdefghijklmnopqrstuvwxyz")
+    @NotBlank(message = "请先完成人机验证")
+    @Size(max = ValidationConstants.TURNSTILE_TOKEN_MAX_LENGTH, message = "人机验证令牌无效")
+    private String turnstileToken;
 }

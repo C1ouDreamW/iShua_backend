@@ -9,12 +9,14 @@ import cn.heycloudream.ishua_backend.dto.user.UserRegisterDTO;
 import cn.heycloudream.ishua_backend.dto.user.UserRegisterEmailCodeDTO;
 import cn.heycloudream.ishua_backend.service.UserService;
 import cn.heycloudream.ishua_backend.service.email.RegisterEmailVerificationService;
+import cn.heycloudream.ishua_backend.util.ClientIpUtils;
 import cn.heycloudream.ishua_backend.util.UserContextHolder;
 import cn.heycloudream.ishua_backend.vo.user.UserLoginVO;
 import cn.heycloudream.ishua_backend.vo.user.UserMeVO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.validation.annotation.Validated;
@@ -42,10 +44,15 @@ public class UserController {
     @ApiDocPublicEndpoint
     @Operation(
             summary = "发送注册邮箱验证码",
-            description = "无需登录。向指定邮箱发送 6 位验证码，用于后续注册。"
+            description = "无需登录。须先通过 Cloudflare Turnstile 人机验证，再向指定邮箱发送 6 位验证码。"
     )
-    public Result<Void> sendRegisterEmailCode(@Valid @RequestBody UserRegisterEmailCodeDTO dto) {
-        registerEmailVerificationService.sendCode(dto.getEmail());
+    public Result<Void> sendRegisterEmailCode(
+            @Valid @RequestBody UserRegisterEmailCodeDTO dto,
+            HttpServletRequest request) {
+        registerEmailVerificationService.sendCode(
+                dto.getEmail(),
+                dto.getTurnstileToken(),
+                ClientIpUtils.resolveClientIp(request));
         return Result.success(null);
     }
 

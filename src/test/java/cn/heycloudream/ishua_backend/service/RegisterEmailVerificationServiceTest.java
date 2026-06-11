@@ -4,6 +4,7 @@ import cn.heycloudream.ishua_backend.common.constants.ValidationConstants;
 import cn.heycloudream.ishua_backend.exception.BusinessException;
 import cn.heycloudream.ishua_backend.service.email.RegisterEmailSender;
 import cn.heycloudream.ishua_backend.service.email.RegisterEmailVerificationService;
+import cn.heycloudream.ishua_backend.service.turnstile.TurnstileVerificationService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -20,6 +21,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -27,6 +29,9 @@ import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class RegisterEmailVerificationServiceTest {
+
+    private static final String TURNSTILE_TOKEN = "turnstile-token";
+    private static final String CLIENT_IP = "203.0.113.1";
 
     @Mock
     private StringRedisTemplate stringRedisTemplate;
@@ -37,8 +42,26 @@ class RegisterEmailVerificationServiceTest {
     @Mock
     private RegisterEmailSender registerEmailSender;
 
+    @Mock
+    private TurnstileVerificationService turnstileVerificationService;
+
     @InjectMocks
     private RegisterEmailVerificationService service;
+
+    @Test
+    @DisplayName("sendCode: Turnstile 校验失败 → 不发邮件")
+    void sendCode_turnstileFailed_shouldNotSendEmail() {
+        doThrow(new BusinessException(400, "人机验证失败，请重试"))
+                .when(turnstileVerificationService)
+                .verifyRegisterEmailCode(TURNSTILE_TOKEN, CLIENT_IP);
+
+        assertThatThrownBy(() -> service.sendCode("user@example.com", TURNSTILE_TOKEN, CLIENT_IP))
+                .isInstanceOf(BusinessException.class)
+                .extracting("code")
+                .isEqualTo(400);
+
+        verify(registerEmailSender, never()).sendVerificationCode(anyString(), anyString());
+    }
 
     @Test
     @DisplayName("sendCode: 冷却期内重复发送 → 429")
@@ -46,11 +69,12 @@ class RegisterEmailVerificationServiceTest {
         when(stringRedisTemplate.opsForValue()).thenReturn(valueOperations);
         when(valueOperations.setIfAbsent(anyString(), eq("1"), any(Duration.class))).thenReturn(false);
 
-        assertThatThrownBy(() -> service.sendCode("user@example.com"))
+        assertThatThrownBy(() -> service.sendCode("user@example.com", TURNSTILE_TOKEN, CLIENT_IP))
                 .isInstanceOf(BusinessException.class)
                 .extracting("code")
                 .isEqualTo(429);
 
+        verify(turnstileVerificationService).verifyRegisterEmailCode(TURNSTILE_TOKEN, CLIENT_IP);
         verify(registerEmailSender, never()).sendVerificationCode(anyString(), anyString());
     }
 
@@ -60,8 +84,9 @@ class RegisterEmailVerificationServiceTest {
         when(stringRedisTemplate.opsForValue()).thenReturn(valueOperations);
         when(valueOperations.setIfAbsent(anyString(), eq("1"), any(Duration.class))).thenReturn(true);
 
-        service.sendCode("User@Example.com");
+        service.sendCode("User@Example.com", TURNSTILE_TOKEN, CLIENT_IP);
 
+        verify(turnstileVerificationService).verifyRegisterEmailCode(TURNSTILE_TOKEN, CLIENT_IP);
         verify(valueOperations, times(2)).set(
                 anyString(),
                 anyString(),
