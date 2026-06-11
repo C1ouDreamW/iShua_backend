@@ -42,7 +42,14 @@ return 1
 
 class RedisManager:
     def __init__(self) -> None:
-        self.client = redis.Redis.from_url(settings.redis_url, decode_responses=True)
+        # redis-py 8 默认 socket_timeout=5s；XREADGROUP block 需更长读超时，否则会误抛 TimeoutError
+        block_seconds = max(settings.redis_block_ms, 0) / 1000.0
+        socket_timeout = None if block_seconds <= 0 else block_seconds + 5.0
+        self.client = redis.Redis.from_url(
+            settings.redis_url,
+            decode_responses=True,
+            socket_timeout=socket_timeout,
+        )
         self._cas_script = self.client.register_script(_CAS_NON_TERMINAL_WRITE)
 
     def ensure_group(self) -> None:
