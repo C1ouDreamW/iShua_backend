@@ -18,7 +18,7 @@ import java.util.Optional;
 /**
  * 管理 {@code ishua:task:status:{taskId}} 的读写，供前端轮询任务状态。
  *
- * @author atlas
+ * @author C1ouD
  */
 @SuppressWarnings("null")
 @Slf4j

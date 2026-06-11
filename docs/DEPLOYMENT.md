@@ -38,14 +38,14 @@
 创建数据库：
 
 ```sql
-CREATE DATABASE ishua_atlas DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+CREATE DATABASE ishua_backend DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 ```
 
 初始化核心表：
 
 ```bash
 cd backend
-mysql -h 127.0.0.1 -P 3306 -u root -p ishua_atlas < sql/schema/init_core_tables.sql
+mysql -h 127.0.0.1 -P 3306 -u root -p ishua_backend < sql/schema/init_core_tables.sql
 ```
 
 如果是从旧版本数据库升级，按实际缺失字段执行 `sql/schema/` 下的增量脚本：
@@ -73,7 +73,7 @@ spring:
 | --- | --- | --- |
 | `DB_HOST` | `127.0.0.1` | MySQL 地址 |
 | `DB_PORT` | `3306` | MySQL 端口 |
-| `DB_NAME` | `ishua_atlas` | 数据库名 |
+| `DB_NAME` | `ishua_backend` | 数据库名 |
 | `DB_USER` | `root` | 数据库用户名 |
 | `DB_PASSWORD` | `root` | 数据库密码 |
 | `REDIS_HOST` | `127.0.0.1` | Redis 地址 |
@@ -92,7 +92,7 @@ spring:
 ```env
 DB_HOST=127.0.0.1
 DB_PORT=3306
-DB_NAME=ishua_atlas
+DB_NAME=ishua_backend
 DB_USER=root
 DB_PASSWORD=change-me
 REDIS_HOST=127.0.0.1
@@ -216,7 +216,7 @@ AI 导入会先由 Java API 将上传文件保存到 `FILE_UPLOAD_DIR`，再把 
 
 ## 部署检查清单
 
-- MySQL 已创建 `ishua_atlas` 并执行初始化 SQL。
+- MySQL 已创建 `ishua_backend` 并执行初始化 SQL。
 - Redis 可被 Java API 和 Worker 访问。
 - `JWT_SECRET` 已替换为足够长的随机密钥。
 - `FILE_UPLOAD_DIR` 为 Java API 和 Worker 共享可访问目录。

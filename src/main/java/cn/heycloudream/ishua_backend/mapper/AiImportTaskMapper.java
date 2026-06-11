@@ -14,7 +14,7 @@ import java.util.List;
 /**
  * AI 导入任务 Mapper。
  *
- * @author atlas
+ * @author C1ouD
  */
 @Mapper
 public interface AiImportTaskMapper extends BaseMapper<AiImportTask> {

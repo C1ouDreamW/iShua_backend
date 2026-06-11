@@ -20,7 +20,7 @@ import java.nio.file.StandardCopyOption;
  * 文件存储于 {@code {base-dir}/} 目录下，以 UUID 命名保留原始扩展名。
  * </p>
  *
- * @author atlas
+ * @author C1ouD
  */
 @Slf4j
 @Service

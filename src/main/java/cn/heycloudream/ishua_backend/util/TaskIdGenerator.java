@@ -8,7 +8,7 @@ import java.util.UUID;
 /**
  * AI 导入任务 ID 生成器（UUID v4，去连字符）。
  *
- * @author atlas
+ * @author C1ouD
  */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class TaskIdGenerator {

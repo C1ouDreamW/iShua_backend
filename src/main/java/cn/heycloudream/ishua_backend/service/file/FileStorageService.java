@@ -11,7 +11,7 @@ import java.nio.file.Path;
  * 当前提供本地文件系统实现，后续可替换为 MinIO / OSS。
  * </p>
  *
- * @author atlas
+ * @author C1ouD
  */
 public interface FileStorageService {
 

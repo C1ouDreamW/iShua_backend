@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 /**
  * AI 导入任务按状态聚合统计项。
  *
- * @author atlas
+ * @author C1ouD
  */
 @Data
 @Builder

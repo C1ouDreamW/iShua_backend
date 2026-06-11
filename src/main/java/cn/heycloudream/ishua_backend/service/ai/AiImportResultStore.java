@@ -20,7 +20,7 @@ import java.util.Optional;
  * 存储 LLM 解析后的题目预览列表（JSON），供前端预览确认后批量落库。
  * </p>
  *
- * @author atlas
+ * @author C1ouD
  */
 @SuppressWarnings("null")
 @Slf4j

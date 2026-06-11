@@ -46,7 +46,7 @@ import org.springframework.web.multipart.MultipartFile;
  * 文档解析与大模型调用由 ai-import-worker Worker 完成，Java 仅负责落盘 / 入 Stream / 提供任务状态。
  * </p>
  *
- * @author atlas
+ * @author C1ouD
  */
 @RestController
 @RequestMapping("/api/v1/ai-import")

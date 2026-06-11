@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 /**
  * 任务元数据，写入 Redis 供消费者和 Watchdog 使用。
  *
- * @author atlas
+ * @author C1ouD
  */
 @Data
 @Builder

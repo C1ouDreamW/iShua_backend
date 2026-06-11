@@ -17,7 +17,7 @@ import java.time.Duration;
  *   <li>{@code "imported"} — 落库已成功（长 TTL，杜绝同一 taskId 在 meta TTL 期内重复落库）。</li>
  * </ul>
  *
- * @author atlas
+ * @author C1ouD
  */
 @SuppressWarnings("null")
 @Slf4j

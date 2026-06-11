@@ -20,7 +20,7 @@ import java.util.Set;
  * 使用 Redis 分布式锁（SETNX）确保单实例执行。
  * </p>
  *
- * @author atlas
+ * @author C1ouD
  */
 @SuppressWarnings("null")
 @Slf4j

@@ -18,7 +18,7 @@ import java.util.Optional;
 /**
  * AI 导入任务持久化服务。
  *
- * @author atlas
+ * @author C1ouD
  */
 public interface AiImportTaskService {
 

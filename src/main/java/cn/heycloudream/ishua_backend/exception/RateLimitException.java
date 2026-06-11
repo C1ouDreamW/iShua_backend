@@ -5,7 +5,7 @@ import lombok.Getter;
 /**
  * 请求频率超限异常，由限流器抛出，全局处理器映射为 HTTP 429。
  *
- * @author atlas
+ * @author C1ouD
  */
 @Getter
 public class RateLimitException extends RuntimeException {

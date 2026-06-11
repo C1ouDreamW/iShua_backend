@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 /**
  * AI 导入流水线耗时（Worker 侧 monotonic 计时，毫秒）。
  *
- * @author atlas
+ * @author C1ouD
  */
 @Data
 @Builder

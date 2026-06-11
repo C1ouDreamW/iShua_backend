@@ -5,7 +5,7 @@ import lombok.Data;
 /**
  * {@code ai_import_task} 按 status 聚合查询行。
  *
- * @author atlas
+ * @author C1ouD
  */
 @Data
 public class AiImportTaskStatusAggRow {

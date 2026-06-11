@@ -12,7 +12,7 @@ import java.util.List;
 /**
  * AI 导入任务状态快照（新任务体系）。
  *
- * @author atlas
+ * @author C1ouD
  */
 @Data
 @Builder

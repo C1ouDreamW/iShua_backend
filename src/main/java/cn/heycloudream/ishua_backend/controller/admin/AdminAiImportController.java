@@ -28,7 +28,7 @@ import org.springframework.web.bind.annotation.RestController;
 /**
  * 管理端 AI 导入任务运维接口。
  *
- * @author atlas
+ * @author C1ouD
  */
 @RestController
 @RequestMapping("/api/v1/admin/ai-import")

@@ -18,7 +18,7 @@ import java.util.Set;
 /**
  * 将 Python Worker 写入 Redis 的任务状态同步到 MySQL 权威表。
  *
- * @author atlas
+ * @author C1ouD
  */
 @Slf4j
 @Component

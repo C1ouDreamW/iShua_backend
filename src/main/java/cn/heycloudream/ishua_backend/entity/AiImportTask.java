@@ -14,7 +14,7 @@ import java.time.LocalDateTime;
 /**
  * AI 导入任务持久化实体，对应数据库表 {@code ai_import_task}。
  *
- * @author atlas
+ * @author C1ouD
  */
 @Data
 @Builder

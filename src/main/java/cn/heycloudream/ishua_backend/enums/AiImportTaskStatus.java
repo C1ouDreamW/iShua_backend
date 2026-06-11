@@ -5,7 +5,7 @@ import java.util.Arrays;
 /**
  * AI 导入任务生命周期状态（5 态 + FAILED）。
  *
- * @author atlas
+ * @author C1ouD
  */
 public enum AiImportTaskStatus {
 

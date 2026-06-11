@@ -8,7 +8,7 @@ import lombok.Data;
 /**
  * 管理端清理长时间未确认 AI 导入任务的请求。
  *
- * @author atlas
+ * @author C1ouD
  */
 @Data
 @Schema(description = """

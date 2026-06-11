@@ -11,7 +11,7 @@ import java.util.List;
 /**
  * 管理端 AI 导入任务清理结果。
  *
- * @author atlas
+ * @author C1ouD
  */
 @Data
 @Builder

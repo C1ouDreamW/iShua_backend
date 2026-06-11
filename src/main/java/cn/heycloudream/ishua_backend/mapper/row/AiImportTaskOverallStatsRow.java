@@ -5,7 +5,7 @@ import lombok.Data;
 /**
  * {@code ai_import_task} 窗口内整体聚合查询行。
  *
- * @author atlas
+ * @author C1ouD
  */
 @Data
 public class AiImportTaskOverallStatsRow {

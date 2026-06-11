@@ -8,7 +8,7 @@ import lombok.EqualsAndHashCode;
 /**
  * AI 导入任务分页查询参数。
  *
- * @author atlas
+ * @author C1ouD
  */
 @Data
 @EqualsAndHashCode(callSuper = true)

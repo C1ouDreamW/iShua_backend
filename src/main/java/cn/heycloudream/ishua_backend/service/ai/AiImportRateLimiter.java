@@ -15,7 +15,7 @@ import java.util.List;
  * 限制单用户每时间窗口内的提交次数，防止资金消耗型 DDoS。
  * </p>
  *
- * @author atlas
+ * @author C1ouD
  */
 @SuppressWarnings("null")
 @Slf4j

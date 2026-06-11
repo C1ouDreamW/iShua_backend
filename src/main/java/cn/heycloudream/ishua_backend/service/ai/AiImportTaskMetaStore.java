@@ -18,7 +18,7 @@ import java.util.Optional;
  * 存储任务元数据（userId、bankId、文件名等），供消费者和 Watchdog 使用。
  * </p>
  *
- * @author atlas
+ * @author C1ouD
  */
 @SuppressWarnings("null")
 @Slf4j
