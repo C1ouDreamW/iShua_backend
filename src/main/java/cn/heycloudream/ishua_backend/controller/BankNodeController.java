@@ -9,8 +9,8 @@ import cn.heycloudream.ishua_backend.config.openapi.ApiDocStandardResponses;
 import cn.heycloudream.ishua_backend.dto.ai.BatchImportRequestDTO;
 import cn.heycloudream.ishua_backend.dto.banknode.BankNodeCreateDTO;
 import cn.heycloudream.ishua_backend.dto.banknode.BankNodeMoveDTO;
-import cn.heycloudream.ishua_backend.dto.banknode.BankNodeRootsQueryDTO;
-import cn.heycloudream.ishua_backend.dto.banknode.BankNodeTreeQueryDTO;
+import cn.heycloudream.ishua_backend.common.dto.PageRequestDTO;
+import cn.heycloudream.ishua_backend.dto.banknode.BankNodeSubtreeQueryDTO;
 import cn.heycloudream.ishua_backend.dto.banknode.BankNodeUpdateDTO;
 import cn.heycloudream.ishua_backend.dto.question.QuestionInBankPageQueryDTO;
 import cn.heycloudream.ishua_backend.dto.question.QuestionUpdateDTO;
@@ -78,44 +78,42 @@ public class BankNodeController {
     private final AiImportTaskMetaStore taskMetaStore;
     private final AiImportTaskService aiImportTaskService;
 
-    @GetMapping("/roots")
+    @GetMapping("/public/roots")
     @ApiDocPublicEndpoint
-    @Operation(summary = "分页查询根节点", description = """
-            scope=public 无需登录，返回大厅可见根节点；scope=mine 须 PREMIUM+ JWT，返回当前用户根节点。
-            """)
-    public Result<PageResultVO<BankNodeVO>> pageRoots(
-            @ParameterObject @Valid @ModelAttribute BankNodeRootsQueryDTO query) {
-        Long userId = UserContextHolder.get();
-        if ("mine".equalsIgnoreCase(query.getScope())) {
-            if (userId == null) {
-                throw new BusinessException(401, "未登录");
-            }
-            UserRole role = UserContextHolder.getRole();
-            if (role == null || !role.includes(UserRole.PREMIUM)) {
-                throw new BusinessException(403, "无权访问");
-            }
-        }
-        return Result.success(bankNodeService.pageRoots(userId, query));
+    @Operation(summary = "分页查询公开根节点", description = "无需登录，返回大厅可见根节点。")
+    public Result<PageResultVO<BankNodeVO>> pagePublicRoots(
+            @ParameterObject @Valid @ModelAttribute PageRequestDTO query) {
+        return Result.success(bankNodeService.pagePublicRoots(query));
     }
 
-    @GetMapping("/tree")
+    @GetMapping("/public/tree")
     @ApiDocPublicEndpoint
-    @Operation(summary = "查询扁平题库树", description = """
-            返回扁平节点列表，前端自行组树。scope=public 无需登录；scope=mine 须 PREMIUM+。
-            可选 rootId 限定子树。
+    @Operation(summary = "查询公开扁平题库树", description = """
+            无需登录。返回扁平节点列表，前端自行组树；可选 rootId 限定子树。
             """)
-    public Result<List<BankNodeVO>> listTree(@ParameterObject @Valid @ModelAttribute BankNodeTreeQueryDTO query) {
+    public Result<List<BankNodeVO>> listPublicTree(
+            @ParameterObject @Valid @ModelAttribute BankNodeSubtreeQueryDTO query) {
+        return Result.success(bankNodeService.listPublicTree(query));
+    }
+
+    @GetMapping("/mine/roots")
+    @RequireRole(UserRole.PREMIUM)
+    @Operation(summary = "分页查询当前用户根节点", description = "须 JWT，最低 PREMIUM（ADMIN 可）。")
+    public Result<PageResultVO<BankNodeVO>> pageMyRoots(
+            @ParameterObject @Valid @ModelAttribute PageRequestDTO query) {
         Long userId = UserContextHolder.get();
-        if ("mine".equalsIgnoreCase(query.getScope())) {
-            if (userId == null) {
-                throw new BusinessException(401, "未登录");
-            }
-            UserRole role = UserContextHolder.getRole();
-            if (role == null || !role.includes(UserRole.PREMIUM)) {
-                throw new BusinessException(403, "无权访问");
-            }
-        }
-        return Result.success(bankNodeService.listTree(userId, query));
+        return Result.success(bankNodeService.pageMyRoots(userId, query));
+    }
+
+    @GetMapping("/mine/tree")
+    @RequireRole(UserRole.PREMIUM)
+    @Operation(summary = "查询当前用户扁平题库树", description = """
+            须 JWT，最低 PREMIUM（ADMIN 可）。返回扁平节点列表；可选 rootId 限定子树。
+            """)
+    public Result<List<BankNodeVO>> listMyTree(
+            @ParameterObject @Valid @ModelAttribute BankNodeSubtreeQueryDTO query) {
+        Long userId = UserContextHolder.get();
+        return Result.success(bankNodeService.listMyTree(userId, query));
     }
 
     @GetMapping("/{nodeId}")

@@ -127,8 +127,10 @@ mvn test
 | --- | --- | --- | --- | --- |
 | **用户鉴权** | `POST` | `/api/v1/users/register` | 否 | 用户注册 |
 | **用户鉴权** | `POST` | `/api/v1/users/login` | 否 | 登录，返回 JWT |
-| **题库树** | `GET` | `/api/v1/bank-nodes/roots` | 公开/`mine` | 根节点分页（大厅入口） |
-| **题库树** | `GET` | `/api/v1/bank-nodes/tree` | 公开/`mine` | 扁平树列表 |
+| **题库树** | `GET` | `/api/v1/bank-nodes/public/roots` | 公开 | 根节点分页（大厅入口） |
+| **题库树** | `GET` | `/api/v1/bank-nodes/public/tree` | 公开 | 公开扁平树列表 |
+| **题库树** | `GET` | `/api/v1/bank-nodes/mine/roots` | `PREMIUM+` | 当前用户根节点分页 |
+| **题库树** | `GET` | `/api/v1/bank-nodes/mine/tree` | `PREMIUM+` | 当前用户扁平树列表 |
 | **题库树** | `POST` | `/api/v1/bank-nodes` | JWT | 创建 FOLDER/LEAF |
 | **题库管理** | `GET` | `/api/v1/question-banks` | JWT | 我的 LEAF 题库分页（兼容） |
 | **题库大厅** | `GET` | `/api/v1/question-banks/public` | 否 | 公开 LEAF 分页（兼容） |

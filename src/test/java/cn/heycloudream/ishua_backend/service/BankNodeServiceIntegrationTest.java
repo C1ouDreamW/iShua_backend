@@ -2,8 +2,8 @@ package cn.heycloudream.ishua_backend.service;
 
 import cn.heycloudream.ishua_backend.dto.banknode.BankNodeCreateDTO;
 import cn.heycloudream.ishua_backend.dto.banknode.BankNodeMoveDTO;
-import cn.heycloudream.ishua_backend.dto.banknode.BankNodeRootsQueryDTO;
-import cn.heycloudream.ishua_backend.dto.banknode.BankNodeTreeQueryDTO;
+import cn.heycloudream.ishua_backend.common.dto.PageRequestDTO;
+import cn.heycloudream.ishua_backend.dto.banknode.BankNodeSubtreeQueryDTO;
 import cn.heycloudream.ishua_backend.dto.question.QuestionUpdateDTO;
 import cn.heycloudream.ishua_backend.enums.UserRole;
 import cn.heycloudream.ishua_backend.exception.BusinessException;
@@ -58,18 +58,14 @@ class BankNodeServiceIntegrationTest extends AbstractMockRedisSpringBootTest {
         assertThat(folder.getChildCount()).isEqualTo(1);
         assertThat(folder.getDescendantLeafCount()).isGreaterThanOrEqualTo(1);
 
-        BankNodeRootsQueryDTO rootsQuery = new BankNodeRootsQueryDTO();
-        rootsQuery.setScope("public");
-        rootsQuery.setCurrent(1);
-        rootsQuery.setPageSize(20);
-        List<BankNodeVO> publicRoots = bankNodeService.pageRoots(null, rootsQuery).getRecords();
+        PageRequestDTO rootsQuery = new PageRequestDTO(1, 20);
+        List<BankNodeVO> publicRoots = bankNodeService.pagePublicRoots(rootsQuery).getRecords();
         assertThat(publicRoots.stream().anyMatch(n -> folderId.equals(n.getId()))).isTrue();
 
-        BankNodeTreeQueryDTO treeQuery = BankNodeTreeQueryDTO.builder()
-                .scope("public")
+        BankNodeSubtreeQueryDTO treeQuery = BankNodeSubtreeQueryDTO.builder()
                 .rootId(folderId)
                 .build();
-        List<BankNodeVO> subtree = bankNodeService.listTree(null, treeQuery);
+        List<BankNodeVO> subtree = bankNodeService.listPublicTree(treeQuery);
         assertThat(subtree).anyMatch(n -> leafId.equals(n.getId()) && n.getQuestionCount() == 1);
     }
 

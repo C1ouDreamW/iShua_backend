@@ -62,8 +62,8 @@ Authorization: Bearer <token>
 - `POST /api/v1/users/register`
 - `POST /api/v1/users/login`
 - `GET /api/v1/question-banks/public`（兼容，返回 LEAF 节点）
-- `GET /api/v1/bank-nodes/roots?scope=public`
-- `GET /api/v1/bank-nodes/tree?scope=public`
+- `GET /api/v1/bank-nodes/public/roots`
+- `GET /api/v1/bank-nodes/public/tree`
 - `GET /api/v1/question-banks/{bankId}/hot-practice-detail`
 - `GET /api/v1/bank-nodes/{nodeId}/hot-practice-detail`
 - Swagger/OpenAPI 文档路径
@@ -144,8 +144,10 @@ Base path：`/api/v1/bank-nodes`
 
 | 方法 | 路径 | 权限 | 说明 |
 | --- | --- | --- | --- |
-| `GET` | `/roots?scope=public\|mine` | `public` 公开；`mine` 须 `PREMIUM+` | 分页查询根节点（大厅入口） |
-| `GET` | `/tree?scope=public\|mine&rootId=` | 同上 | 扁平树列表，前端自行组树 |
+| `GET` | `/public/roots` | 公开 | 分页查询大厅可见根节点 |
+| `GET` | `/public/tree?rootId=` | 公开 | 公开扁平树列表，前端自行组树 |
+| `GET` | `/mine/roots` | `PREMIUM+` | 分页查询当前用户根节点 |
+| `GET` | `/mine/tree?rootId=` | `PREMIUM+` | 当前用户扁平树列表 |
 | `GET` | `/{nodeId}` | `PREMIUM+` | 节点详情（含 `childCount` 等统计） |
 | `POST` | `/` | `PREMIUM+` | 创建 FOLDER 或 LEAF |
 | `PUT` | `/{nodeId}` | `PREMIUM+` | 更新节点 |

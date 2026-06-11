@@ -4,14 +4,12 @@ import cn.heycloudream.ishua_backend.common.dto.PageRequestDTO;
 import cn.heycloudream.ishua_backend.common.vo.PageResultVO;
 import cn.heycloudream.ishua_backend.dto.banknode.BankNodeCreateDTO;
 import cn.heycloudream.ishua_backend.dto.banknode.BankNodeMoveDTO;
-import cn.heycloudream.ishua_backend.dto.banknode.BankNodeRootsQueryDTO;
-import cn.heycloudream.ishua_backend.dto.banknode.BankNodeTreeQueryDTO;
+import cn.heycloudream.ishua_backend.dto.banknode.BankNodeSubtreeQueryDTO;
 import cn.heycloudream.ishua_backend.dto.banknode.BankNodeUpdateDTO;
 import cn.heycloudream.ishua_backend.dto.questionbank.QuestionBankCreateDTO;
 import cn.heycloudream.ishua_backend.dto.questionbank.QuestionBankUpdateDTO;
 import cn.heycloudream.ishua_backend.entity.BankNode;
 import cn.heycloudream.ishua_backend.enums.BankNodeKind;
-import cn.heycloudream.ishua_backend.enums.BankTreeScope;
 import cn.heycloudream.ishua_backend.exception.BusinessException;
 import cn.heycloudream.ishua_backend.mapper.BankNodeMapper;
 import cn.heycloudream.ishua_backend.service.BankNodeService;
@@ -141,29 +139,33 @@ public class BankNodeServiceImpl implements BankNodeService {
     }
 
     @Override
-    public PageResultVO<BankNodeVO> pageRoots(Long currentUserId, BankNodeRootsQueryDTO query) {
-        BankTreeScope scope = BankTreeScope.fromQueryValue(query.getScope());
-        List<BankNode> roots = new ArrayList<>(switch (scope) {
-            case MINE -> filterMineRoots(listAllByUser(currentUserId));
-            case PUBLIC -> filterPublicRoots(listAllNodes());
-        });
+    public PageResultVO<BankNodeVO> pagePublicRoots(PageRequestDTO query) {
+        List<BankNode> roots = new ArrayList<>(filterPublicRoots(listAllNodes()));
         roots.sort(rootComparator());
-        return paginateRoots(roots, query.getCurrent(), query.getPageSize(), scope == BankTreeScope.PUBLIC
-                ? listAllNodes()
-                : listAllByUser(currentUserId));
+        return paginateRoots(roots, query.getCurrent(), query.getPageSize(), listAllNodes());
     }
 
     @Override
-    public List<BankNodeVO> listTree(Long currentUserId, BankNodeTreeQueryDTO query) {
-        BankTreeScope scope = BankTreeScope.fromQueryValue(query.getScope());
-        List<BankNode> source = switch (scope) {
-            case MINE -> listAllByUser(currentUserId);
-            case PUBLIC -> filterPublicVisibleNodes(listAllNodes());
-        };
+    public List<BankNodeVO> listPublicTree(BankNodeSubtreeQueryDTO query) {
+        List<BankNode> source = filterPublicVisibleNodes(listAllNodes());
         if (query.getRootId() != null) {
-            if (scope == BankTreeScope.MINE) {
-                bankAccessGuard.requireOwnedNode(currentUserId, query.getRootId());
-            }
+            source = BankNodeTreeSupport.filterSubtree(source, query.getRootId());
+        }
+        return toVoListWithStats(source);
+    }
+
+    @Override
+    public PageResultVO<BankNodeVO> pageMyRoots(Long currentUserId, PageRequestDTO query) {
+        List<BankNode> roots = new ArrayList<>(filterMineRoots(listAllByUser(currentUserId)));
+        roots.sort(rootComparator());
+        return paginateRoots(roots, query.getCurrent(), query.getPageSize(), listAllByUser(currentUserId));
+    }
+
+    @Override
+    public List<BankNodeVO> listMyTree(Long currentUserId, BankNodeSubtreeQueryDTO query) {
+        List<BankNode> source = listAllByUser(currentUserId);
+        if (query.getRootId() != null) {
+            bankAccessGuard.requireOwnedNode(currentUserId, query.getRootId());
             source = BankNodeTreeSupport.filterSubtree(source, query.getRootId());
         }
         return toVoListWithStats(source);

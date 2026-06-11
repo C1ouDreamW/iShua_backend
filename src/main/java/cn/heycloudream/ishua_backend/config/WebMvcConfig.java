@@ -28,8 +28,8 @@ public class WebMvcConfig implements WebMvcConfigurer {
                         "/api/v1/users/login",
                         // 题库大厅（公开题库分页列表，无需登录）
                         "/api/v1/question-banks/public",
-                        "/api/v1/bank-nodes/roots",
-                        "/api/v1/bank-nodes/tree",
+                        "/api/v1/bank-nodes/public/roots",
+                        "/api/v1/bank-nodes/public/tree",
                         // 公开热点题库详情（无需登录）
                         "/api/v1/question-banks/*/hot-practice-detail",
                         "/api/v1/bank-nodes/*/hot-practice-detail",
@@ -48,8 +48,8 @@ public class WebMvcConfig implements WebMvcConfigurer {
                         "/api/v1/users/login",
                         // 题库大厅（公开题库分页列表，无需登录）
                         "/api/v1/question-banks/public",
-                        "/api/v1/bank-nodes/roots",
-                        "/api/v1/bank-nodes/tree",
+                        "/api/v1/bank-nodes/public/roots",
+                        "/api/v1/bank-nodes/public/tree",
                         // 公开热点题库详情（无需登录）
                         "/api/v1/question-banks/*/hot-practice-detail",
                         "/api/v1/bank-nodes/*/hot-practice-detail",

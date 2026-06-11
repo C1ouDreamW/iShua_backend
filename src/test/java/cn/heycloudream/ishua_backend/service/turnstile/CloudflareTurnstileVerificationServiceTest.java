@@ -73,15 +73,29 @@ class CloudflareTurnstileVerificationServiceTest {
                 .isEqualTo(400);
     }
 
+    @Test
+    @DisplayName("verifyRegisterEmailCode: 响应含 messages 字段可正常反序列化")
+    void verifyRegisterEmailCode_responseWithMessages_shouldDeserialize() throws Exception {
+        stubSiteverifyResponse(
+                """
+                {"success":true,"action":"register_email_code","messages":["Token validated."]}
+                """);
+
+        service.verifyRegisterEmailCode("token", "127.0.0.1");
+    }
+
     private void stubSiteverifyResponse(boolean success, String action) throws Exception {
         TurnstileSiteverifyResponse body = new TurnstileSiteverifyResponse();
         body.setSuccess(success);
         body.setAction(action);
+        stubSiteverifyResponse(objectMapper.writeValueAsString(body));
+    }
 
+    private void stubSiteverifyResponse(String bodyJson) throws Exception {
         @SuppressWarnings("unchecked")
         HttpResponse<String> httpResponse = mock(HttpResponse.class);
         when(httpResponse.statusCode()).thenReturn(200);
-        when(httpResponse.body()).thenReturn(objectMapper.writeValueAsString(body));
+        when(httpResponse.body()).thenReturn(bodyJson);
         when(httpClient.send(any(HttpRequest.class), any(HttpResponse.BodyHandler.class)))
                 .thenReturn(httpResponse);
     }

@@ -52,7 +52,8 @@ public class CloudflareTurnstileVerificationService implements TurnstileVerifica
 
         TurnstileSiteverifyResponse response = callSiteverify(token, remoteIp);
         if (!response.isSuccess()) {
-            log.warn("Turnstile 校验失败 errorCodes={}", response.getErrorCodes());
+            log.warn("Turnstile 校验失败 errorCodes={} messages={}",
+                    response.getErrorCodes(), response.getMessages());
             throw new BusinessException(400, "人机验证失败，请重试");
         }
 
