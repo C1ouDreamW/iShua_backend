@@ -10,12 +10,12 @@ SET NAMES utf8mb4;
 -- 清理已有测试数据（按外键依赖逆序）
 DELETE FROM `wrong_question` WHERE `user_id` = 1;
 DELETE FROM `question` WHERE `question_bank_id` IN (1, 2, 3);
-DELETE FROM `question_bank` WHERE `user_id` = 1;
+DELETE FROM `bank_node` WHERE `user_id` = 1;
 DELETE FROM `sys_user` WHERE `id` = 1;
 
 -- 重置自增（可选，确保数据从 1 开始）
 ALTER TABLE `sys_user` AUTO_INCREMENT = 1;
-ALTER TABLE `question_bank` AUTO_INCREMENT = 1;
+ALTER TABLE `bank_node` AUTO_INCREMENT = 1;
 ALTER TABLE `question` AUTO_INCREMENT = 1;
 ALTER TABLE `wrong_question` AUTO_INCREMENT = 1;
 
@@ -26,24 +26,24 @@ INSERT INTO `sys_user` (`id`, `username`, `password_hash`, `nickname`, `role`, `
 VALUES (1, 'testuser', '$2a$10$N.zmdr9k7uOCQb376NoUnuTJ8iAt6Z5EHsM8lE9lBOsl7iKTVKIUi', '测试同学', 'PREMIUM', NOW(), NOW());
 
 -- ============================================
--- 2. 题库
+-- 2. 题库树节点（LEAF = 可挂题题库）
 -- ============================================
 
--- 题库 A：公开热点题库（压测靶心，is_public=1）
-INSERT INTO `question_bank` (`id`, `user_id`, `title`, `description`, `is_public`, `create_time`, `update_time`)
-VALUES (1, 1, '2026计算机网络期末必刷题',
+-- 节点 A：公开热点题库（压测靶心，is_public=1）
+INSERT INTO `bank_node` (`id`, `user_id`, `parent_id`, `node_kind`, `title`, `description`, `is_public`, `sort_no`, `question_count`, `create_time`, `update_time`)
+VALUES (1, 1, NULL, 'LEAF', '2026计算机网络期末必刷题',
         '覆盖 OSI 七层模型、TCP/UDP、HTTP 协议、网络安全等核心考点，共 15 道精选试题。',
-        1, NOW(), NOW());
+        1, 0, 15, NOW(), NOW());
 
--- 题库 B：公开题库（另一个公开题库，用于验证多题库场景）
-INSERT INTO `question_bank` (`id`, `user_id`, `title`, `description`, `is_public`, `create_time`, `update_time`)
-VALUES (2, 1, '数据结构与算法基础题库',
+-- 节点 B：公开题库（另一个公开题库，用于验证多题库场景）
+INSERT INTO `bank_node` (`id`, `user_id`, `parent_id`, `node_kind`, `title`, `description`, `is_public`, `sort_no`, `question_count`, `create_time`, `update_time`)
+VALUES (2, 1, NULL, 'LEAF', '数据结构与算法基础题库',
         '包含数组、链表、栈、队列、树、图、排序算法等经典题型。',
-        1, NOW(), NOW());
+        1, 0, 5, NOW(), NOW());
 
--- 题库 C：私有题库（验证权限隔离）
-INSERT INTO `question_bank` (`id`, `user_id`, `title`, `description`, `is_public`, `create_time`, `update_time`)
-VALUES (3, 1, '高等数学（上）错题重刷集', '个人整理的高数易错题，仅供自己复习使用。', 0, NOW(), NOW());
+-- 节点 C：私有题库（验证权限隔离）
+INSERT INTO `bank_node` (`id`, `user_id`, `parent_id`, `node_kind`, `title`, `description`, `is_public`, `sort_no`, `question_count`, `create_time`, `update_time`)
+VALUES (3, 1, NULL, 'LEAF', '高等数学（上）错题重刷集', '个人整理的高数易错题，仅供自己复习使用。', 0, 0, 5, NOW(), NOW());
 
 -- ============================================
 -- 3. 试题 — 题库 A（计算机网络，15 题）

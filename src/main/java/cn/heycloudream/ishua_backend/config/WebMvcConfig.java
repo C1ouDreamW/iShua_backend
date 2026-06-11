@@ -28,8 +28,11 @@ public class WebMvcConfig implements WebMvcConfigurer {
                         "/api/v1/users/login",
                         // 题库大厅（公开题库分页列表，无需登录）
                         "/api/v1/question-banks/public",
+                        "/api/v1/bank-nodes/roots",
+                        "/api/v1/bank-nodes/tree",
                         // 公开热点题库详情（无需登录）
                         "/api/v1/question-banks/*/hot-practice-detail",
+                        "/api/v1/bank-nodes/*/hot-practice-detail",
                         // Swagger / OpenAPI 文档
                         "/swagger-ui/**",
                         "/swagger-ui.html",
@@ -45,8 +48,11 @@ public class WebMvcConfig implements WebMvcConfigurer {
                         "/api/v1/users/login",
                         // 题库大厅（公开题库分页列表，无需登录）
                         "/api/v1/question-banks/public",
+                        "/api/v1/bank-nodes/roots",
+                        "/api/v1/bank-nodes/tree",
                         // 公开热点题库详情（无需登录）
                         "/api/v1/question-banks/*/hot-practice-detail",
+                        "/api/v1/bank-nodes/*/hot-practice-detail",
                         // Swagger / OpenAPI 文档
                         "/swagger-ui/**",
                         "/swagger-ui.html",

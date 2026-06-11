@@ -2,9 +2,10 @@ package cn.heycloudream.ishua_backend.service.impl;
 
 import cn.heycloudream.ishua_backend.common.constants.IShuaRedisCacheConstants;
 import cn.heycloudream.ishua_backend.entity.Question;
-import cn.heycloudream.ishua_backend.entity.QuestionBank;
+import cn.heycloudream.ishua_backend.entity.BankNode;
+import cn.heycloudream.ishua_backend.enums.BankNodeKind;
 import cn.heycloudream.ishua_backend.exception.BusinessException;
-import cn.heycloudream.ishua_backend.mapper.QuestionBankMapper;
+import cn.heycloudream.ishua_backend.mapper.BankNodeMapper;
 import cn.heycloudream.ishua_backend.mapper.QuestionMapper;
 import cn.heycloudream.ishua_backend.service.QuestionBankHotDetailService;
 import cn.heycloudream.ishua_backend.vo.question.QuestionVO;
@@ -51,7 +52,7 @@ public class QuestionBankHotDetailServiceImpl implements QuestionBankHotDetailSe
 
     private final StringRedisTemplate stringRedisTemplate;
     private final ObjectMapper objectMapper;
-    private final QuestionBankMapper questionBankMapper;
+    private final BankNodeMapper bankNodeMapper;
     private final QuestionMapper questionMapper;
 
     @Override
@@ -108,16 +109,13 @@ public class QuestionBankHotDetailServiceImpl implements QuestionBankHotDetailSe
             throw new BusinessException(404, "题库不存在");
         }
 
-        QuestionBank bank = questionBankMapper.selectById(bankId);
+        BankNode bank = requirePublicLeaf(bankId);
         if (bank == null) {
             stringRedisTemplate.opsForValue().set(
                     cacheKey,
                     IShuaRedisCacheConstants.NULL_BANK_PLACEHOLDER,
                     Duration.ofSeconds(IShuaRedisCacheConstants.NULL_BANK_CACHE_TTL_SECONDS));
             throw new BusinessException(404, "题库不存在");
-        }
-        if (bank.getIsPublic() == null || bank.getIsPublic() != 1) {
-            throw new BusinessException(403, "仅公开热点题库支持聚合刷题缓存接口");
         }
 
         QuestionBankDetailBundleVO bundle = buildBundle(bank);
@@ -138,17 +136,25 @@ public class QuestionBankHotDetailServiceImpl implements QuestionBankHotDetailSe
      * 自旋超时后的兜底：不再写缓存，避免多线程同时回源放大。
      */
     private QuestionBankDetailBundleVO loadPublicBundleFromDbWithoutWrite(long bankId) {
-        QuestionBank bank = questionBankMapper.selectById(bankId);
+        BankNode bank = requirePublicLeaf(bankId);
+        return buildBundle(bank);
+    }
+
+    private BankNode requirePublicLeaf(long bankId) {
+        BankNode bank = bankNodeMapper.selectById(bankId);
         if (bank == null) {
-            throw new BusinessException(404, "题库不存在");
+            return null;
+        }
+        if (!BankNodeKind.LEAF.name().equals(bank.getNodeKind())) {
+            throw new BusinessException(400, "仅题库节点支持热点刷题缓存");
         }
         if (bank.getIsPublic() == null || bank.getIsPublic() != 1) {
             throw new BusinessException(403, "仅公开热点题库支持聚合刷题缓存接口");
         }
-        return buildBundle(bank);
+        return bank;
     }
 
-    private QuestionBankDetailBundleVO buildBundle(QuestionBank bank) {
+    private QuestionBankDetailBundleVO buildBundle(BankNode bank) {
         List<Question> questions = questionMapper.selectList(
                 new LambdaQueryWrapper<Question>()
                         .eq(Question::getQuestionBankId, bank.getId())
@@ -197,7 +203,7 @@ public class QuestionBankHotDetailServiceImpl implements QuestionBankHotDetailSe
         }
     }
 
-    private QuestionBankVO toBankVo(QuestionBank e) {
+    private QuestionBankVO toBankVo(BankNode e) {
         return QuestionBankVO.builder()
                 .id(e.getId())
                 .userId(e.getUserId())

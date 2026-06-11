@@ -6,6 +6,7 @@ import cn.heycloudream.ishua_backend.dto.question.QuestionUpdateDTO;
 import cn.heycloudream.ishua_backend.entity.Question;
 import cn.heycloudream.ishua_backend.exception.BusinessException;
 import cn.heycloudream.ishua_backend.mapper.QuestionMapper;
+import cn.heycloudream.ishua_backend.service.BankNodeService;
 import cn.heycloudream.ishua_backend.service.QuestionService;
 import cn.heycloudream.ishua_backend.service.cache.QuestionBankDetailCacheEvictor;
 import cn.heycloudream.ishua_backend.service.guard.BankAccessGuard;
@@ -41,16 +42,19 @@ public class QuestionServiceImpl extends ServiceImpl<QuestionMapper, Question> i
 
     private final QuestionBankDetailCacheEvictor questionBankDetailCacheEvictor;
     private final BankAccessGuard bankAccessGuard;
+    private final BankNodeService bankNodeService;
     private final ObjectMapper objectMapper;
 
     public QuestionServiceImpl(
             QuestionMapper questionMapper,
             QuestionBankDetailCacheEvictor questionBankDetailCacheEvictor,
             BankAccessGuard bankAccessGuard,
+            BankNodeService bankNodeService,
             ObjectMapper objectMapper) {
         this.baseMapper = questionMapper;
         this.questionBankDetailCacheEvictor = questionBankDetailCacheEvictor;
         this.bankAccessGuard = bankAccessGuard;
+        this.bankNodeService = bankNodeService;
         this.objectMapper = objectMapper;
     }
 
@@ -61,11 +65,12 @@ public class QuestionServiceImpl extends ServiceImpl<QuestionMapper, Question> i
             return;
         }
         saveBatch(questions, SAVE_BATCH_SIZE);
-        questions.stream()
+        Map<Long, Long> countByBank = questions.stream()
                 .map(Question::getQuestionBankId)
                 .filter(Objects::nonNull)
-                .distinct()
-                .forEach(bid -> questionBankDetailCacheEvictor.evict(bid));
+                .collect(Collectors.groupingBy(id -> id, Collectors.counting()));
+        countByBank.forEach((bankId, count) -> bankNodeService.adjustQuestionCount(bankId, count.intValue()));
+        countByBank.keySet().forEach(questionBankDetailCacheEvictor::evict);
     }
 
     @Override
@@ -152,6 +157,7 @@ public class QuestionServiceImpl extends ServiceImpl<QuestionMapper, Question> i
                 .isDeleted(0)
                 .build();
         baseMapper.insert(entity);
+        bankNodeService.adjustQuestionCount(bankId, 1);
         questionBankDetailCacheEvictor.evict(bankId);
         return entity.getId();
     }
@@ -186,6 +192,7 @@ public class QuestionServiceImpl extends ServiceImpl<QuestionMapper, Question> i
         Long bankId = q.getQuestionBankId();
         bankAccessGuard.requireOwnedBank(currentUserId, bankId);
         baseMapper.deleteById(questionId);
+        bankNodeService.adjustQuestionCount(bankId, -1);
         questionBankDetailCacheEvictor.evict(bankId);
     }
 
@@ -193,6 +200,7 @@ public class QuestionServiceImpl extends ServiceImpl<QuestionMapper, Question> i
     @Transactional(rollbackFor = Exception.class)
     public void removeQuestionsByBankId(Long bankId) {
         remove(new LambdaQueryWrapper<Question>().eq(Question::getQuestionBankId, bankId));
+        bankNodeService.resetQuestionCount(bankId, 0);
         questionBankDetailCacheEvictor.evict(bankId);
     }
 

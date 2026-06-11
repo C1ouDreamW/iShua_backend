@@ -1,6 +1,6 @@
 DROP TABLE IF EXISTS wrong_question;
 DROP TABLE IF EXISTS question;
-DROP TABLE IF EXISTS question_bank;
+DROP TABLE IF EXISTS bank_node;
 DROP TABLE IF EXISTS sys_user;
 
 CREATE TABLE sys_user (
@@ -19,18 +19,23 @@ CREATE UNIQUE INDEX uk_username ON sys_user (username, is_deleted);
 CREATE UNIQUE INDEX uk_email ON sys_user (email, is_deleted);
 CREATE INDEX idx_create_time ON sys_user (create_time);
 
-CREATE TABLE question_bank (
-    id          BIGINT       NOT NULL AUTO_INCREMENT PRIMARY KEY,
-    user_id     BIGINT       NOT NULL,
-    title       VARCHAR(200) NOT NULL,
-    description VARCHAR(1000),
-    is_public   TINYINT      NOT NULL DEFAULT 1,
-    create_time TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    update_time TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    is_deleted  TINYINT      NOT NULL DEFAULT 0
+CREATE TABLE bank_node (
+    id              BIGINT       NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    user_id         BIGINT       NOT NULL,
+    parent_id       BIGINT,
+    node_kind       VARCHAR(16)  NOT NULL,
+    title           VARCHAR(200) NOT NULL,
+    description     VARCHAR(1000),
+    is_public       TINYINT      NOT NULL DEFAULT 0,
+    sort_no         INT          NOT NULL DEFAULT 0,
+    question_count  INT          NOT NULL DEFAULT 0,
+    create_time     TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    update_time     TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    is_deleted      TINYINT      NOT NULL DEFAULT 0
 );
-CREATE INDEX idx_user_id ON question_bank (user_id);
-CREATE INDEX idx_user_public ON question_bank (user_id, is_public, is_deleted);
+CREATE INDEX idx_user_parent_sort ON bank_node (user_id, parent_id, sort_no, is_deleted);
+CREATE INDEX idx_parent_sort ON bank_node (parent_id, sort_no, is_deleted);
+CREATE INDEX idx_root_public ON bank_node (parent_id, is_public, node_kind, is_deleted);
 
 CREATE TABLE question (
     id               BIGINT       NOT NULL AUTO_INCREMENT PRIMARY KEY,

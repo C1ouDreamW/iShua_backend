@@ -1,7 +1,7 @@
 package cn.heycloudream.ishua_backend.support;
 
-import cn.heycloudream.ishua_backend.entity.QuestionBank;
-import cn.heycloudream.ishua_backend.mapper.QuestionBankMapper;
+import cn.heycloudream.ishua_backend.entity.BankNode;
+import cn.heycloudream.ishua_backend.mapper.BankNodeMapper;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,14 +14,16 @@ import static org.assertj.core.api.Assertions.assertThat;
 class H2SchemaSmokeTest extends AbstractMockRedisSpringBootTest {
 
     @Autowired
-    private QuestionBankMapper questionBankMapper;
+    private BankNodeMapper bankNodeMapper;
 
     @Test
-    @DisplayName("H2 种子数据：公开题库 bankId=1 可查询")
-    void shouldLoadSeedQuestionBank() {
-        QuestionBank bank = questionBankMapper.selectById(1L);
-        assertThat(bank).isNotNull();
-        assertThat(bank.getUserId()).isEqualTo(1L);
-        assertThat(bank.getIsPublic()).isEqualTo(1);
+    @DisplayName("H2 种子数据：公开 LEAF 节点 id=1 可查询")
+    void shouldLoadSeedBankNode() {
+        BankNode node = bankNodeMapper.selectById(1L);
+        assertThat(node).isNotNull();
+        assertThat(node.getUserId()).isEqualTo(1L);
+        assertThat(node.getNodeKind()).isEqualTo("LEAF");
+        assertThat(node.getIsPublic()).isEqualTo(1);
+        assertThat(node.getQuestionCount()).isEqualTo(2);
     }
 }

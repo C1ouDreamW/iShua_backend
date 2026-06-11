@@ -2,9 +2,10 @@ package cn.heycloudream.ishua_backend.service.impl;
 
 import cn.heycloudream.ishua_backend.dto.practice.AnswerSubmitDTO;
 import cn.heycloudream.ishua_backend.entity.Question;
-import cn.heycloudream.ishua_backend.entity.QuestionBank;
+import cn.heycloudream.ishua_backend.entity.BankNode;
+import cn.heycloudream.ishua_backend.enums.BankNodeKind;
 import cn.heycloudream.ishua_backend.exception.BusinessException;
-import cn.heycloudream.ishua_backend.mapper.QuestionBankMapper;
+import cn.heycloudream.ishua_backend.service.BankNodeService;
 import cn.heycloudream.ishua_backend.service.PracticeService;
 import cn.heycloudream.ishua_backend.service.QuestionBankHotDetailService;
 import cn.heycloudream.ishua_backend.service.QuestionService;
@@ -44,7 +45,7 @@ import java.util.stream.Collectors;
 public class PracticeServiceImpl implements PracticeService {
 
     private final QuestionBankHotDetailService questionBankHotDetailService;
-    private final QuestionBankMapper questionBankMapper;
+    private final BankNodeService bankNodeService;
     private final QuestionService questionService;
     private final WrongQuestionService wrongQuestionService;
     private final BankAccessGuard bankAccessGuard;
@@ -52,7 +53,7 @@ public class PracticeServiceImpl implements PracticeService {
 
     @Override
     public List<PracticeQuestionVO> listPracticeQuestions(Long userId, Long bankId, boolean random) {
-        QuestionBank bank = requireExistsBank(bankId);
+        BankNode bank = requirePracticeLeaf(bankId);
 
         List<PracticeQuestionVO> questions;
         if (isPublic(bank)) {
@@ -190,22 +191,22 @@ public class PracticeServiceImpl implements PracticeService {
         if (!bankId.equals(question.getQuestionBankId())) {
             throw new BusinessException(400, "试题不属于该题库");
         }
-        QuestionBank bank = requireExistsBank(bankId);
+        BankNode bank = requirePracticeLeaf(bankId);
         if (!isPublic(bank)) {
             bankAccessGuard.requirePrivatePracticeAccess(userId, UserContextHolder.getRole(), bank);
         }
         return question;
     }
 
-    private QuestionBank requireExistsBank(Long bankId) {
-        QuestionBank bank = questionBankMapper.selectById(bankId);
-        if (bank == null) {
-            throw new BusinessException(404, "题库不存在");
+    private BankNode requirePracticeLeaf(Long bankId) {
+        BankNode node = bankNodeService.requireExistsNode(bankId);
+        if (!BankNodeKind.LEAF.name().equals(node.getNodeKind())) {
+            throw new BusinessException(400, "仅题库节点支持刷题");
         }
-        return bank;
+        return node;
     }
 
-    private boolean isPublic(QuestionBank bank) {
+    private boolean isPublic(BankNode bank) {
         return bank.getIsPublic() != null && bank.getIsPublic() == 1;
     }
 

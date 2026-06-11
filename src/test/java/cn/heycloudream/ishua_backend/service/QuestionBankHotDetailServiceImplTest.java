@@ -1,10 +1,10 @@
 package cn.heycloudream.ishua_backend.service;
 
 import cn.heycloudream.ishua_backend.common.constants.IShuaRedisCacheConstants;
+import cn.heycloudream.ishua_backend.entity.BankNode;
 import cn.heycloudream.ishua_backend.entity.Question;
-import cn.heycloudream.ishua_backend.entity.QuestionBank;
 import cn.heycloudream.ishua_backend.exception.BusinessException;
-import cn.heycloudream.ishua_backend.mapper.QuestionBankMapper;
+import cn.heycloudream.ishua_backend.mapper.BankNodeMapper;
 import cn.heycloudream.ishua_backend.mapper.QuestionMapper;
 import cn.heycloudream.ishua_backend.service.impl.QuestionBankHotDetailServiceImpl;
 import cn.heycloudream.ishua_backend.vo.questionbank.QuestionBankDetailBundleVO;
@@ -52,7 +52,7 @@ class QuestionBankHotDetailServiceImplTest {
     private final ObjectMapper objectMapper = new ObjectMapper().registerModule(new JavaTimeModule());
 
     @Mock
-    private QuestionBankMapper questionBankMapper;
+    private BankNodeMapper bankNodeMapper;
 
     @Mock
     private QuestionMapper questionMapper;
@@ -63,7 +63,7 @@ class QuestionBankHotDetailServiceImplTest {
     void initService() {
         when(stringRedisTemplate.opsForValue()).thenReturn(valueOperations);
         hotDetailService = new QuestionBankHotDetailServiceImpl(
-                stringRedisTemplate, objectMapper, questionBankMapper, questionMapper);
+                stringRedisTemplate, objectMapper, bankNodeMapper, questionMapper);
     }
 
     @Test
@@ -78,7 +78,7 @@ class QuestionBankHotDetailServiceImplTest {
         QuestionBankDetailBundleVO result = hotDetailService.getHotPublicBankDetail(BANK_ID);
 
         assertThat(result.getBank().getTitle()).isEqualTo("缓存题库");
-        verify(questionBankMapper, never()).selectById(any());
+        verify(bankNodeMapper, never()).selectById(any());
     }
 
     @Test
@@ -90,7 +90,7 @@ class QuestionBankHotDetailServiceImplTest {
                 .isInstanceOf(BusinessException.class)
                 .extracting("code")
                 .isEqualTo(404);
-        verify(questionBankMapper, never()).selectById(any());
+        verify(bankNodeMapper, never()).selectById(any());
     }
 
     @Test
@@ -100,8 +100,8 @@ class QuestionBankHotDetailServiceImplTest {
         when(valueOperations.setIfAbsent(anyString(), anyString(), any(Duration.class))).thenReturn(true);
         when(stringRedisTemplate.execute(any(), any(), any())).thenReturn(1L);
 
-        QuestionBank bank = publicBank();
-        when(questionBankMapper.selectById(BANK_ID)).thenReturn(bank);
+        BankNode bank = publicBank();
+        when(bankNodeMapper.selectById(BANK_ID)).thenReturn(bank);
         when(questionMapper.selectList(any())).thenReturn(Collections.emptyList());
 
         QuestionBankDetailBundleVO result = hotDetailService.getHotPublicBankDetail(BANK_ID);
@@ -117,13 +117,14 @@ class QuestionBankHotDetailServiceImplTest {
         when(valueOperations.setIfAbsent(anyString(), anyString(), any(Duration.class))).thenReturn(true);
         when(stringRedisTemplate.execute(any(), any(), any())).thenReturn(1L);
 
-        QuestionBank bank = QuestionBank.builder()
+        BankNode bank = BankNode.builder()
                 .id(BANK_ID)
                 .userId(1L)
+                .nodeKind("LEAF")
                 .isPublic(0)
                 .title("私有题库")
                 .build();
-        when(questionBankMapper.selectById(BANK_ID)).thenReturn(bank);
+        when(bankNodeMapper.selectById(BANK_ID)).thenReturn(bank);
 
         assertThatThrownBy(() -> hotDetailService.getHotPublicBankDetail(BANK_ID))
                 .isInstanceOf(BusinessException.class)
@@ -137,7 +138,7 @@ class QuestionBankHotDetailServiceImplTest {
         when(valueOperations.get(CACHE_KEY)).thenReturn(null);
         when(valueOperations.setIfAbsent(anyString(), anyString(), any(Duration.class))).thenReturn(true);
         when(stringRedisTemplate.execute(any(), any(), any())).thenReturn(1L);
-        when(questionBankMapper.selectById(BANK_ID)).thenReturn(null);
+        when(bankNodeMapper.selectById(BANK_ID)).thenReturn(null);
 
         assertThatThrownBy(() -> hotDetailService.getHotPublicBankDetail(BANK_ID))
                 .isInstanceOf(BusinessException.class)
@@ -167,7 +168,7 @@ class QuestionBankHotDetailServiceImplTest {
         QuestionBankDetailBundleVO result = hotDetailService.getHotPublicBankDetail(BANK_ID);
 
         assertThat(result.getBank().getId()).isEqualTo(BANK_ID);
-        verify(questionBankMapper, never()).selectById(any());
+        verify(bankNodeMapper, never()).selectById(any());
     }
 
     @Test
@@ -176,8 +177,8 @@ class QuestionBankHotDetailServiceImplTest {
         when(valueOperations.get(CACHE_KEY)).thenReturn(null);
         when(valueOperations.setIfAbsent(anyString(), anyString(), any(Duration.class))).thenReturn(false);
 
-        QuestionBank bank = publicBank();
-        when(questionBankMapper.selectById(BANK_ID)).thenReturn(bank);
+        BankNode bank = publicBank();
+        when(bankNodeMapper.selectById(BANK_ID)).thenReturn(bank);
         when(questionMapper.selectList(any())).thenReturn(List.of(sampleQuestion()));
 
         QuestionBankDetailBundleVO result = hotDetailService.getHotPublicBankDetail(BANK_ID);
@@ -186,10 +187,11 @@ class QuestionBankHotDetailServiceImplTest {
         verify(valueOperations, never()).set(eq(CACHE_KEY), anyString(), any(Duration.class));
     }
 
-    private static QuestionBank publicBank() {
-        return QuestionBank.builder()
+    private static BankNode publicBank() {
+        return BankNode.builder()
                 .id(BANK_ID)
                 .userId(1L)
+                .nodeKind("LEAF")
                 .title("公开题库")
                 .isPublic(1)
                 .createTime(LocalDateTime.now())

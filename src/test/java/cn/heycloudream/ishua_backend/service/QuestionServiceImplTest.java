@@ -1,6 +1,7 @@
 package cn.heycloudream.ishua_backend.service;
 
 import cn.heycloudream.ishua_backend.dto.question.QuestionUpdateDTO;
+import cn.heycloudream.ishua_backend.entity.BankNode;
 import cn.heycloudream.ishua_backend.entity.Question;
 import cn.heycloudream.ishua_backend.exception.BusinessException;
 import cn.heycloudream.ishua_backend.mapper.QuestionMapper;
@@ -43,6 +44,9 @@ class QuestionServiceImplTest {
     @Mock
     private BankAccessGuard bankAccessGuard;
 
+    @Mock
+    private BankNodeService bankNodeService;
+
     private QuestionServiceImpl questionService;
 
     @BeforeEach
@@ -51,6 +55,7 @@ class QuestionServiceImplTest {
                 questionMapper,
                 questionBankDetailCacheEvictor,
                 bankAccessGuard,
+                bankNodeService,
                 new ObjectMapper());
     }
 
@@ -83,7 +88,7 @@ class QuestionServiceImplTest {
     @DisplayName("createQuestionInBank: 成功后驱逐缓存")
     void createQuestionInBank_success_shouldEvictCache() {
         when(bankAccessGuard.requireOwnedBank(USER_ID, BANK_ID))
-                .thenReturn(cn.heycloudream.ishua_backend.entity.QuestionBank.builder().id(BANK_ID).build());
+                .thenReturn(BankNode.builder().id(BANK_ID).nodeKind("LEAF").build());
         when(questionMapper.insert(any(Question.class))).thenAnswer(inv -> {
             Question entity = inv.getArgument(0);
             entity.setId(QUESTION_ID);
@@ -108,7 +113,7 @@ class QuestionServiceImplTest {
         Question q = Question.builder().id(QUESTION_ID).questionBankId(BANK_ID).build();
         when(questionMapper.selectById(QUESTION_ID)).thenReturn(q);
         when(bankAccessGuard.requireOwnedBank(USER_ID, BANK_ID))
-                .thenReturn(cn.heycloudream.ishua_backend.entity.QuestionBank.builder().id(BANK_ID).build());
+                .thenReturn(BankNode.builder().id(BANK_ID).nodeKind("LEAF").build());
 
         questionService.deleteQuestion(USER_ID, QUESTION_ID);
 
@@ -120,7 +125,7 @@ class QuestionServiceImplTest {
     @DisplayName("batchImportPreview: 空列表不写库")
     void batchImportPreview_empty_shouldSkip() {
         when(bankAccessGuard.requireOwnedBank(USER_ID, BANK_ID))
-                .thenReturn(cn.heycloudream.ishua_backend.entity.QuestionBank.builder().id(BANK_ID).build());
+                .thenReturn(BankNode.builder().id(BANK_ID).nodeKind("LEAF").build());
 
         questionService.batchImportPreview(USER_ID, BANK_ID, java.util.List.of());
 

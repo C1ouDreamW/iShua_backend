@@ -61,8 +61,11 @@ Authorization: Bearer <token>
 
 - `POST /api/v1/users/register`
 - `POST /api/v1/users/login`
-- `GET /api/v1/question-banks/public`
+- `GET /api/v1/question-banks/public`（兼容，返回 LEAF 节点）
+- `GET /api/v1/bank-nodes/roots?scope=public`
+- `GET /api/v1/bank-nodes/tree?scope=public`
 - `GET /api/v1/question-banks/{bankId}/hot-practice-detail`
+- `GET /api/v1/bank-nodes/{nodeId}/hot-practice-detail`
 - Swagger/OpenAPI 文档路径
 
 ## 用户鉴权
@@ -127,6 +130,59 @@ Base path：`/api/v1/question-banks`
 - `isPublic=1` 表示公开题库，可出现在公开大厅。
 - 我的题库、题库写操作和私有题库试题管理要求 `PREMIUM` 或 `ADMIN`。
 - `ADMIN` 可绕过题库归属校验。
+
+## 题库树（Phase 1）
+
+Base path：`/api/v1/bank-nodes`
+
+节点类型：
+
+| `nodeKind` | 说明 |
+| --- | --- |
+| `FOLDER` | 文件夹容器，不可挂题/刷题/AI 导入 |
+| `LEAF` | 叶子题库，可挂题、刷题、导入；`bankId` / `nodeId` 均指 LEAF |
+
+| 方法 | 路径 | 权限 | 说明 |
+| --- | --- | --- | --- |
+| `GET` | `/roots?scope=public\|mine` | `public` 公开；`mine` 须 `PREMIUM+` | 分页查询根节点（大厅入口） |
+| `GET` | `/tree?scope=public\|mine&rootId=` | 同上 | 扁平树列表，前端自行组树 |
+| `GET` | `/{nodeId}` | `PREMIUM+` | 节点详情（含 `childCount` 等统计） |
+| `POST` | `/` | `PREMIUM+` | 创建 FOLDER 或 LEAF |
+| `PUT` | `/{nodeId}` | `PREMIUM+` | 更新节点 |
+| `DELETE` | `/{nodeId}` | `PREMIUM+` | 删除节点（FOLDER 递归删子树） |
+| `PATCH` | `/{nodeId}/move` | `PREMIUM+` | 移动节点，防环校验 |
+| `GET` | `/{nodeId}/hot-practice-detail` | 公开 | 公开 LEAF 热点刷题缓存 |
+| `GET` | `/{nodeId}/questions` | `PREMIUM+` | LEAF 下试题分页 |
+| `POST` | `/{nodeId}/questions` | `PREMIUM+` | LEAF 下新增试题 |
+| `POST` | `/{nodeId}/questions/batch` | `PREMIUM+` | AI 批量入库 |
+
+创建节点请求体示例：
+
+```json
+{
+  "parentId": null,
+  "nodeKind": "FOLDER",
+  "title": "高等数学",
+  "description": "",
+  "isPublic": 0,
+  "sortNo": 0
+}
+```
+
+移动节点请求体：
+
+```json
+{
+  "newParentId": 5,
+  "newSortNo": 0
+}
+```
+
+说明：
+
+- 旧路径 `/api/v1/question-banks/*` 仍可用，内部映射为 **根级 LEAF** 的兼容操作。
+- 题目仍存于单表 `question`，`question_bank_id` 指向 LEAF 节点 id。
+- 本地开发需重建库：执行 `sql/schema/init_core_tables.sql`。
 
 ## 试题管理
 

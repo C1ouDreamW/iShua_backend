@@ -3,7 +3,7 @@ SET NAMES utf8mb4;
 DROP TABLE IF EXISTS `wrong_question`;
 DROP TABLE IF EXISTS `question`;
 DROP TABLE IF EXISTS `ai_import_task`;
-DROP TABLE IF EXISTS `question_bank`;
+DROP TABLE IF EXISTS `bank_node`;
 DROP TABLE IF EXISTS `sys_user`;
 
 CREATE TABLE `sys_user` (
@@ -23,25 +23,30 @@ CREATE TABLE `sys_user` (
   KEY `idx_create_time` (`create_time`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='sys_user';
 
-CREATE TABLE `question_bank` (
+CREATE TABLE `bank_node` (
   `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'primary key',
   `user_id` BIGINT UNSIGNED NOT NULL COMMENT 'owner user id',
-  `title` VARCHAR(200) NOT NULL COMMENT 'question bank title',
-  `description` VARCHAR(1000) DEFAULT NULL COMMENT 'question bank description',
-  `is_public` TINYINT UNSIGNED NOT NULL DEFAULT 1 COMMENT 'public flag',
+  `parent_id` BIGINT UNSIGNED DEFAULT NULL COMMENT 'parent node id, NULL for forest root',
+  `node_kind` VARCHAR(16) NOT NULL COMMENT 'FOLDER | LEAF',
+  `title` VARCHAR(200) NOT NULL COMMENT 'node title',
+  `description` VARCHAR(1000) DEFAULT NULL COMMENT 'node description',
+  `is_public` TINYINT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'public flag, meaningful for LEAF',
+  `sort_no` INT NOT NULL DEFAULT 0 COMMENT 'sort order among siblings',
+  `question_count` INT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'denormalized question count, LEAF only',
   `create_time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'create time',
   `update_time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'update time',
   `is_deleted` TINYINT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'logical delete flag',
   PRIMARY KEY (`id`),
-  KEY `idx_user_id` (`user_id`),
-  KEY `idx_user_public` (`user_id`, `is_public`, `is_deleted`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='question_bank';
+  KEY `idx_user_parent_sort` (`user_id`, `parent_id`, `sort_no`, `is_deleted`),
+  KEY `idx_parent_sort` (`parent_id`, `sort_no`, `is_deleted`),
+  KEY `idx_root_public` (`parent_id`, `is_public`, `node_kind`, `is_deleted`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='bank_node';
 
 CREATE TABLE `ai_import_task` (
   `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'primary key',
   `task_id` VARCHAR(64) NOT NULL COMMENT 'business task id',
   `user_id` BIGINT UNSIGNED NOT NULL COMMENT 'submitter user id',
-  `bank_id` BIGINT UNSIGNED NOT NULL COMMENT 'target bank id',
+  `bank_id` BIGINT UNSIGNED NOT NULL COMMENT 'target LEAF node id',
   `status` VARCHAR(32) NOT NULL COMMENT 'SUBMITTED/PROCESSING/PARSED/IMPORTING/IMPORTED/FAILED/EXPIRED',
   `file_name` VARCHAR(255) DEFAULT NULL COMMENT 'source file name',
   `file_size` BIGINT UNSIGNED DEFAULT NULL COMMENT 'file size bytes',
@@ -69,7 +74,7 @@ CREATE TABLE `ai_import_task` (
 
 CREATE TABLE `question` (
   `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'primary key',
-  `question_bank_id` BIGINT UNSIGNED NOT NULL COMMENT 'bank id',
+  `question_bank_id` BIGINT UNSIGNED NOT NULL COMMENT 'LEAF bank_node id',
   `question_type` VARCHAR(32) NOT NULL DEFAULT 'SINGLE' COMMENT 'question type',
   `stem` LONGTEXT NOT NULL COMMENT 'question stem',
   `options_json` JSON DEFAULT NULL COMMENT 'options json',
