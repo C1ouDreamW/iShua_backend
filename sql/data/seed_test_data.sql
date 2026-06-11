@@ -7,7 +7,8 @@
 
 SET NAMES utf8mb4;
 
--- 清理已有测试数据（按外键依赖逆序）
+-- 清理已有测试数据（按依赖逆序）
+DELETE FROM `ai_import_task` WHERE `user_id` = 1 OR `bank_id` IN (1, 2, 3);
 DELETE FROM `wrong_question` WHERE `user_id` = 1;
 DELETE FROM `question` WHERE `question_bank_id` IN (1, 2, 3);
 DELETE FROM `bank_node` WHERE `user_id` = 1;
@@ -18,12 +19,13 @@ ALTER TABLE `sys_user` AUTO_INCREMENT = 1;
 ALTER TABLE `bank_node` AUTO_INCREMENT = 1;
 ALTER TABLE `question` AUTO_INCREMENT = 1;
 ALTER TABLE `wrong_question` AUTO_INCREMENT = 1;
+ALTER TABLE `ai_import_task` AUTO_INCREMENT = 1;
 
 -- ============================================
 -- 1. 测试用户
 -- ============================================
-INSERT INTO `sys_user` (`id`, `username`, `password_hash`, `nickname`, `role`, `create_time`, `update_time`)
-VALUES (1, 'testuser', '$2a$10$N.zmdr9k7uOCQb376NoUnuTJ8iAt6Z5EHsM8lE9lBOsl7iKTVKIUi', '测试同学', 'PREMIUM', NOW(), NOW());
+INSERT INTO `sys_user` (`id`, `username`, `password_hash`, `email`, `nickname`, `role`, `email_verified_at`, `create_time`, `update_time`)
+VALUES (1, 'testuser', '$2a$10$N.zmdr9k7uOCQb376NoUnuTJ8iAt6Z5EHsM8lE9lBOsl7iKTVKIUi', 'testuser@example.com', '测试同学', 'PREMIUM', NOW(), NOW(), NOW());
 
 -- ============================================
 -- 2. 题库树节点（LEAF = 可挂题题库）
@@ -43,7 +45,7 @@ VALUES (2, 1, NULL, 'LEAF', '数据结构与算法基础题库',
 
 -- 节点 C：私有题库（验证权限隔离）
 INSERT INTO `bank_node` (`id`, `user_id`, `parent_id`, `node_kind`, `title`, `description`, `is_public`, `sort_no`, `question_count`, `create_time`, `update_time`)
-VALUES (3, 1, NULL, 'LEAF', '高等数学（上）错题重刷集', '个人整理的高数易错题，仅供自己复习使用。', 0, 0, 5, NOW(), NOW());
+VALUES (3, 1, NULL, 'LEAF', '高等数学（上）错题重刷集', '个人整理的高数易错题，仅供自己复习使用。', 0, 0, 2, NOW(), NOW());
 
 -- ============================================
 -- 3. 试题 — 题库 A（计算机网络，15 题）
@@ -260,6 +262,6 @@ VALUES (1, 1, 1, NOW(), NOW(), NOW());
 INSERT INTO `wrong_question` (`user_id`, `question_id`, `wrong_count`, `last_wrong_time`, `create_time`, `update_time`)
 VALUES (1, 4, 2, NOW(), NOW(), NOW());
 
--- 做错数据结构第 1 题 1 次
+-- 做错数据结构第 1 题 1 次（题库 B 首题 id=16）
 INSERT INTO `wrong_question` (`user_id`, `question_id`, `wrong_count`, `last_wrong_time`, `create_time`, `update_time`)
-VALUES (1, 6, 1, NOW(), NOW(), NOW());
+VALUES (1, 16, 1, NOW(), NOW(), NOW());

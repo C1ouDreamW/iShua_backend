@@ -70,6 +70,47 @@ class BankNodeServiceIntegrationTest extends AbstractMockRedisSpringBootTest {
     }
 
     @Test
+    @DisplayName("移动节点：同级重排应更新 sortNo 并反映顺序")
+    void moveNode_reorderSiblings_shouldRenumber() {
+        UserContextTestSupport.setUser(1L, UserRole.PREMIUM);
+
+        Long folderId = bankNodeService.createNode(1L, BankNodeCreateDTO.builder()
+                .nodeKind("FOLDER")
+                .title("排序测试文件夹")
+                .build());
+        Long firstLeafId = bankNodeService.createNode(1L, BankNodeCreateDTO.builder()
+                .parentId(folderId)
+                .nodeKind("LEAF")
+                .title("第一题")
+                .build());
+        Long secondLeafId = bankNodeService.createNode(1L, BankNodeCreateDTO.builder()
+                .parentId(folderId)
+                .nodeKind("LEAF")
+                .title("第二题")
+                .build());
+
+        bankNodeService.moveNode(1L, firstLeafId, BankNodeMoveDTO.builder()
+                .newParentId(folderId)
+                .newSortNo(1)
+                .build());
+
+        BankNodeSubtreeQueryDTO treeQuery = BankNodeSubtreeQueryDTO.builder()
+                .rootId(folderId)
+                .build();
+        List<BankNodeVO> subtree = bankNodeService.listMyTree(1L, treeQuery);
+        List<BankNodeVO> children = subtree.stream()
+                .filter(node -> folderId.equals(node.getParentId()))
+                .sorted((left, right) -> Integer.compare(left.getSortNo(), right.getSortNo()))
+                .toList();
+
+        assertThat(children).hasSize(2);
+        assertThat(children.get(0).getId()).isEqualTo(secondLeafId);
+        assertThat(children.get(0).getSortNo()).isZero();
+        assertThat(children.get(1).getId()).isEqualTo(firstLeafId);
+        assertThat(children.get(1).getSortNo()).isEqualTo(1);
+    }
+
+    @Test
     @DisplayName("移动节点：不能移到自身子树下")
     void moveNode_toDescendant_shouldReject() {
         UserContextTestSupport.setUser(1L, UserRole.PREMIUM);

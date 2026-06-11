@@ -52,16 +52,21 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 /**
- * 题库 REST 接口：题库 CRUD、试题分页/创建，以及批量确认导入。
+ * 题库 REST 接口（兼容层）：委托 {@code BankNodeService}，映射根级 LEAF。
  *
  * @author C1ouD
+ * @deprecated 请改用 {@code /api/v1/bank-nodes}；本控制器保留联调兼容。
  */
+@Deprecated(since = "1.1", forRemoval = false)
 @Slf4j
 @RestController
 @RequestMapping("/api/v1/question-banks")
 @RequiredArgsConstructor
 @Validated
-@Tag(name = "题库管理", description = "公开大厅/热点详情无需登录；写操作与「我的题库」须 JWT 且最低 PREMIUM（ADMIN 含）；批量入库见 batch 接口")
+@Tag(name = "题库管理（已废弃）", description = """
+        **已废弃**，请改用 `/api/v1/bank-nodes`。本组接口仍可用，内部映射根级 LEAF 节点。
+        公开大厅/热点详情无需登录；写操作须 JWT 且最低 PREMIUM。
+        """)
 @SecurityRequirement(name = OpenApiConfig.BEARER_AUTH)
 @ApiDocStandardResponses
 public class QuestionBankController {
@@ -79,6 +84,7 @@ public class QuestionBankController {
     @GetMapping
     @RequireRole(UserRole.PREMIUM)
     @Operation(
+            deprecated = true,
             summary = "分页查询当前用户的题库列表",
             description = """
                     须 JWT，最低角色 PREMIUM（ADMIN 可）。Query：`current`、`pageSize`（必填）。仅返回当前用户创建的题库，按更新时间倒序。
@@ -93,6 +99,7 @@ public class QuestionBankController {
     @GetMapping("/public")
     @ApiDocPublicEndpoint
     @Operation(
+            deprecated = true,
             summary = "分页查询所有公开题库列表",
             description = """
                     **无需登录。** Query：`current`、`pageSize`（必填）。
@@ -106,6 +113,7 @@ public class QuestionBankController {
     @PostMapping
     @RequireRole(UserRole.PREMIUM)
     @Operation(
+            deprecated = true,
             summary = "创建题库",
             description = """
                     须 JWT，最低角色 PREMIUM（ADMIN 可）。成功 data 为新题库 ID（Long）。
@@ -120,6 +128,7 @@ public class QuestionBankController {
     @GetMapping("/{bankId}/hot-practice-detail")
     @ApiDocPublicEndpoint
     @Operation(
+            deprecated = true,
             summary = "获取公开热点题库刷题聚合数据（Redis 缓存）",
             description = """
                     **无需登录。** 返回题库信息 + 全量试题（QuestionBankDetailBundleVO）。
@@ -134,6 +143,7 @@ public class QuestionBankController {
     @GetMapping("/{bankId}/questions")
     @RequireRole(UserRole.PREMIUM)
     @Operation(
+            deprecated = true,
             summary = "分页查询指定题库下的试题",
             description = """
                     须 JWT，最低角色 PREMIUM（ADMIN 可 bypass 归属）。须为题库所有者。Query：`current`、`pageSize`（必填），`keyword`（可选，题干模糊）。
@@ -150,6 +160,7 @@ public class QuestionBankController {
     @PostMapping("/{bankId}/questions")
     @RequireRole(UserRole.PREMIUM)
     @Operation(
+            deprecated = true,
             summary = "在指定题库下新增试题",
             description = """
                     须 JWT，最低角色 PREMIUM（ADMIN 可 bypass 归属）。请求体为 QuestionUpdateDTO（含 optionsJson、answerJson 等 JSON 字符串字段），
@@ -168,6 +179,7 @@ public class QuestionBankController {
     @PostMapping("/{bankId}/questions/batch")
     @RequireRole(UserRole.PREMIUM)
     @Operation(
+            deprecated = true,
             summary = "批量确认导入 AI 解析题目（幂等）",
             description = """
                     须 JWT，最低角色 PREMIUM（ADMIN 可 bypass 题库归属）。前端在 `GET .../ai-import/tasks/{taskId}/status` 返回 **PARSED** 且预览确认后调用。
@@ -287,6 +299,7 @@ public class QuestionBankController {
     @PutMapping("/{bankId}")
     @RequireRole(UserRole.PREMIUM)
     @Operation(
+            deprecated = true,
             summary = "全量更新题库",
             description = """
                     须 JWT，最低角色 PREMIUM（ADMIN 可 bypass 归属），仅题库所有者可改。成功 data=null。
@@ -304,6 +317,7 @@ public class QuestionBankController {
     @DeleteMapping("/{bankId}")
     @RequireRole(UserRole.PREMIUM)
     @Operation(
+            deprecated = true,
             summary = "删除题库",
             description = """
                     须 JWT，最低角色 PREMIUM（ADMIN 可 bypass 归属），逻辑删除题库并级联逻辑删除其下全部试题。

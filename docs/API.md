@@ -99,39 +99,9 @@ Base path：`/api/v1/users`
 
 登录成功后 `data` 包含 `token`、用户 ID、用户名、昵称和角色。
 
-## 题库管理
+## 题库树（推荐）
 
-Base path：`/api/v1/question-banks`
-
-| 方法 | 路径 | 权限 | 说明 |
-| --- | --- | --- | --- |
-| `GET` | `/` | `PREMIUM+` | 分页查询当前用户创建的题库 |
-| `GET` | `/public` | 公开 | 分页查询公开题库 |
-| `POST` | `/` | `PREMIUM+` | 创建题库 |
-| `GET` | `/{bankId}/hot-practice-detail` | 公开 | 获取公开热点题库聚合数据，走 Redis 缓存 |
-| `GET` | `/{bankId}/questions` | `PREMIUM+` | 分页查询指定题库下的试题 |
-| `POST` | `/{bankId}/questions` | `PREMIUM+` | 在指定题库下新增试题 |
-| `POST` | `/{bankId}/questions/batch` | `PREMIUM+` | AI 解析预览确认后批量入库 |
-| `PUT` | `/{bankId}` | `PREMIUM+` | 全量更新题库 |
-| `DELETE` | `/{bankId}` | `PREMIUM+` | 逻辑删除题库及其试题 |
-
-创建/更新题库请求体：
-
-```json
-{
-  "title": "2026计算机网络期末必刷题",
-  "description": "面向期末周的重点题型整理",
-  "isPublic": 1
-}
-```
-
-说明：
-
-- `isPublic=1` 表示公开题库，可出现在公开大厅。
-- 我的题库、题库写操作和私有题库试题管理要求 `PREMIUM` 或 `ADMIN`。
-- `ADMIN` 可绕过题库归属校验。
-
-## 题库树（Phase 1）
+> **前端与新产品能力请使用本节。** `/api/v1/question-banks/*` 为兼容层（根级 LEAF 映射），OpenAPI 已标记 `deprecated`。
 
 Base path：`/api/v1/bank-nodes`
 
@@ -182,9 +152,22 @@ Base path：`/api/v1/bank-nodes`
 
 说明：
 
-- 旧路径 `/api/v1/question-banks/*` 仍可用，内部映射为 **根级 LEAF** 的兼容操作。
 - 题目仍存于单表 `question`，`question_bank_id` 指向 LEAF 节点 id。
 - 本地开发需重建库：执行 `sql/schema/init_core_tables.sql`。
+
+## 题库管理（已废弃 · 兼容）
+
+Base path：`/api/v1/question-banks` · **deprecated**
+
+| 方法 | 路径 | 权限 | 说明 |
+| --- | --- | --- | --- |
+| `GET` | `/` | `PREMIUM+` | 兼容：我的根级 LEAF 分页 |
+| `GET` | `/public` | 公开 | 兼容：公开 LEAF 平铺分页 |
+| `POST` | `/` | `PREMIUM+` | 兼容：创建根级 LEAF |
+| `GET` | `/{bankId}/hot-practice-detail` | 公开 | 兼容：请改用 `GET /bank-nodes/{nodeId}/hot-practice-detail` |
+| `GET/POST` | `/{bankId}/questions` | `PREMIUM+` | 兼容：请改用 `/bank-nodes/{nodeId}/questions` |
+| `POST` | `/{bankId}/questions/batch` | `PREMIUM+` | 兼容：AI 批量入库 |
+| `PUT/DELETE` | `/{bankId}` | `PREMIUM+` | 兼容：更新/删除根级 LEAF |
 
 ## 试题管理
 

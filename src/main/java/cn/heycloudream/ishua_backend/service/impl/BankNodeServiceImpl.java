@@ -30,6 +30,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -110,26 +111,40 @@ public class BankNodeServiceImpl implements BankNodeService {
     public void moveNode(Long currentUserId, Long nodeId, BankNodeMoveDTO dto) {
         BankNode node = bankAccessGuard.requireOwnedNode(currentUserId, nodeId);
         Long newParentId = dto.getNewParentId();
+        List<BankNode> owned = listAllByUser(currentUserId);
         if (newParentId != null) {
             BankNode parent = bankAccessGuard.requireOwnedNode(currentUserId, newParentId);
             bankAccessGuard.requireFolder(parent);
             if (nodeId.equals(newParentId)) {
                 throw new BusinessException(400, "不能将节点移动到自身");
             }
-            List<BankNode> owned = listAllByUser(currentUserId);
             Map<Long, BankNode> byId = BankNodeTreeSupport.indexById(owned);
             if (BankNodeTreeSupport.isDescendant(nodeId, newParentId, byId)) {
                 throw new BusinessException(400, "不能将节点移动到其子节点下");
             }
         }
+
+        Long oldParentId = node.getParentId();
+        Map<Long, List<BankNode>> childrenByParent = BankNodeTreeSupport.groupByParent(owned);
+        List<BankNode> targetSiblings = new ArrayList<>(
+                childrenByParent.getOrDefault(newParentId, List.of()));
+        targetSiblings.removeIf(current -> nodeId.equals(current.getId()));
+
+        int targetIndex = dto.getNewSortNo() != null ? dto.getNewSortNo() : targetSiblings.size();
+        targetIndex = Math.min(Math.max(targetIndex, 0), targetSiblings.size());
+
         node.setParentId(newParentId);
-        if (dto.getNewSortNo() != null) {
-            node.setSortNo(dto.getNewSortNo());
-        } else {
-            node.setSortNo(nextSortNo(currentUserId, newParentId));
+        targetSiblings.add(targetIndex, node);
+
+        LocalDateTime now = LocalDateTime.now();
+        renumberSiblingSortNos(targetSiblings, now);
+
+        if (!Objects.equals(oldParentId, newParentId)) {
+            List<BankNode> oldSiblings = new ArrayList<>(
+                    childrenByParent.getOrDefault(oldParentId, List.of()));
+            oldSiblings.removeIf(current -> nodeId.equals(current.getId()));
+            renumberSiblingSortNos(oldSiblings, now);
         }
-        node.setUpdateTime(LocalDateTime.now());
-        bankNodeMapper.updateById(node);
     }
 
     @Override
@@ -392,6 +407,17 @@ public class BankNodeServiceImpl implements BankNodeService {
                 .createTime(node.getCreateTime())
                 .updateTime(node.getUpdateTime())
                 .build();
+    }
+
+    private void renumberSiblingSortNos(List<BankNode> siblings, LocalDateTime now) {
+        for (int index = 0; index < siblings.size(); index++) {
+            BankNode sibling = siblings.get(index);
+            if (!Integer.valueOf(index).equals(sibling.getSortNo())) {
+                sibling.setSortNo(index);
+                sibling.setUpdateTime(now);
+                bankNodeMapper.updateById(sibling);
+            }
+        }
     }
 
     private int nextSortNo(Long userId, Long parentId) {

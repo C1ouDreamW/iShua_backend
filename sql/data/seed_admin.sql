@@ -6,9 +6,11 @@
 
 SET NAMES utf8mb4;
 
-INSERT INTO `sys_user` (`username`, `password_hash`, `nickname`, `role`, `create_time`, `update_time`)
-VALUES ('admin', '$2a$10$N.zmdr9k7uOCQb376NoUnuTJ8iAt6Z5EHsM8lE9lBOsl7iKTVKIUi', '平台管理员', 'ADMIN', NOW(), NOW())
+INSERT INTO `sys_user` (`username`, `password_hash`, `email`, `nickname`, `role`, `email_verified_at`, `create_time`, `update_time`)
+VALUES ('admin', '$2a$10$N.zmdr9k7uOCQb376NoUnuTJ8iAt6Z5EHsM8lE9lBOsl7iKTVKIUi', 'admin@example.com', '平台管理员', 'ADMIN', NOW(), NOW(), NOW())
 ON DUPLICATE KEY UPDATE
   `nickname` = VALUES(`nickname`),
+  `email` = VALUES(`email`),
   `role` = 'ADMIN',
+  `email_verified_at` = COALESCE(`email_verified_at`, NOW()),
   `update_time` = NOW();
