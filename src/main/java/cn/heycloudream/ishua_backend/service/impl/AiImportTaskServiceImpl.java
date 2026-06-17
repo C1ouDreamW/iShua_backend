@@ -451,7 +451,7 @@ public class AiImportTaskServiceImpl implements AiImportTaskService {
             return objectMapper.writeValueAsString(questions);
         } catch (JsonProcessingException e) {
             log.error("[AiImportTask] 序列化预览题目失败 taskId={}", taskId, e);
-            throw new BusinessException(500, "序列化预览题目失败");
+            throw new BusinessException(500, "序列化预览题目失败", e);
         }
     }
 

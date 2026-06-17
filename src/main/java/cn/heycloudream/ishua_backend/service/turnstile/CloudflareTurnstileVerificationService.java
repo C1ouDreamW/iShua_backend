@@ -107,7 +107,7 @@ public class CloudflareTurnstileVerificationService implements TurnstileVerifica
             throw new BusinessException(500, "人机验证服务暂不可用，请稍后重试");
         } catch (IOException e) {
             log.warn("Turnstile Siteverify 调用异常", e);
-            throw new BusinessException(500, "人机验证服务暂不可用，请稍后重试");
+            throw new BusinessException(500, "人机验证服务暂不可用，请稍后重试", e);
         }
     }
 }

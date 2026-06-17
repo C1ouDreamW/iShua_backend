@@ -67,9 +67,9 @@ public class ResendRegisterEmailSender implements RegisterEmailSender {
             }
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
-            throw new BusinessException(500, "验证码邮件发送失败，请稍后重试");
+            throw new BusinessException(500, "验证码邮件发送失败，请稍后重试", e);
         } catch (IOException e) {
-            throw new BusinessException(500, "验证码邮件发送失败，请稍后重试");
+            throw new BusinessException(500, "验证码邮件发送失败，请稍后重试", e);
         }
     }
 

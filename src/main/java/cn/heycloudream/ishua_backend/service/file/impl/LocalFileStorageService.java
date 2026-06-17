@@ -8,7 +8,9 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import jakarta.annotation.PostConstruct;
 import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -32,11 +34,15 @@ public class LocalFileStorageService implements FileStorageService {
 
     public LocalFileStorageService(@Value("${ishua.filestorage.local-dir:/tmp/atlas/upload}") String localDir) {
         this.baseDir = Paths.get(localDir).toAbsolutePath().normalize();
+    }
+
+    @PostConstruct
+    void initStorageDir() {
         try {
             Files.createDirectories(this.baseDir);
             log.info("[文件存储] 本地存储目录已就绪: {}", this.baseDir);
         } catch (IOException e) {
-            throw new RuntimeException("无法创建文件存储目录: " + this.baseDir, e);
+            throw new UncheckedIOException("无法创建文件存储目录: " + this.baseDir, e);
         }
     }
 

@@ -91,7 +91,7 @@ public class QuestionServiceImpl extends ServiceImpl<QuestionMapper, Question> i
                 optionsJson = objectMapper.writeValueAsString(p.getOptions());
                 answerJson = objectMapper.writeValueAsString(p.getAnswer());
             } catch (JsonProcessingException e) {
-                throw new BusinessException(500, "序列化选项/答案 JSON 失败: " + e.getMessage());
+                throw new BusinessException(500, "序列化选项/答案 JSON 失败", e);
             }
             Question q = Question.builder()
                     .questionBankId(bankId)

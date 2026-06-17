@@ -127,7 +127,7 @@ public class QuestionBankHotDetailServiceImpl implements QuestionBankHotDetailSe
             stringRedisTemplate.opsForValue().set(cacheKey, json, Duration.ofSeconds(ttlSeconds));
         } catch (JsonProcessingException e) {
             log.error("热点题库详情序列化失败, bankId={}", bankId, e);
-            throw new BusinessException(500, "缓存序列化失败");
+            throw new BusinessException(500, "缓存序列化失败", e);
         }
         return bundle;
     }

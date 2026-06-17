@@ -22,6 +22,11 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(BusinessException.class)
     public Result<Void> handleBusiness(BusinessException e) {
+        if (e.getCause() != null) {
+            log.error("业务异常包含根因 code={}", e.getCode(), e);
+        } else {
+            log.warn("业务异常 code={} message={}", e.getCode(), e.getMessage());
+        }
         return Result.fail(e.getCode(), e.getMessage());
     }
 

@@ -67,7 +67,7 @@ public class AiQuestionImportServiceImpl implements AiQuestionImportService {
             fileUrl = fileStorageService.store(file);
         } catch (IOException e) {
             log.error("[submitFileImport] 文件落盘失败 bankId={}", bankId, e);
-            throw new BusinessException(500, "文件存储失败: " + e.getMessage());
+            throw new BusinessException(500, "文件存储失败", e);
         }
 
         String taskId = TaskIdGenerator.generate();

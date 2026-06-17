@@ -1,6 +1,7 @@
 package cn.heycloudream.ishua_backend.service.ai;
 
 import cn.heycloudream.ishua_backend.common.constants.IShuaRedisCacheConstants;
+import cn.heycloudream.ishua_backend.exception.BusinessException;
 import cn.heycloudream.ishua_backend.vo.ai.QuestionPreviewVO;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -44,7 +45,7 @@ public class AiImportResultStore {
                     Duration.ofSeconds(IShuaRedisCacheConstants.TASK_RESULT_TTL_SECONDS));
         } catch (JsonProcessingException e) {
             log.error("[TaskId:{}] 序列化解析结果失败", taskId, e);
-            throw new RuntimeException("序列化解析结果失败", e);
+            throw new BusinessException(500, "序列化解析结果失败", e);
         }
     }
 
