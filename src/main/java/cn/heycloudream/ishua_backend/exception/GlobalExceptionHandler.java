@@ -101,6 +101,16 @@ public class GlobalExceptionHandler {
         return Result.fail(415, "不支持的 Content-Type，支持：" + e.getSupportedMediaTypes());
     }
 
+    /**
+     * 请求路径不存在（不含 Controller 映射，也不匹配任何静态资源）。
+     * Spring 6.2+ 由 ResourceHttpRequestHandler 抛出。
+     */
+    @ExceptionHandler(org.springframework.web.servlet.resource.NoResourceFoundException.class)
+    public Result<Void> handleNoResourceFound(org.springframework.web.servlet.resource.NoResourceFoundException e) {
+        log.warn("请求路径不存在: {}", e.getMessage());
+        return Result.fail(404, "请求路径不存在");
+    }
+
     /** Redis / MySQL 等数据访问异常，对外统一返回 500。 */
     @ExceptionHandler(DataAccessException.class)
     public Result<Void> handleDataAccess(DataAccessException e) {
