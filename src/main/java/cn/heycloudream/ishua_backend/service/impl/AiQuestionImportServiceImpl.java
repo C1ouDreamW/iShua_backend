@@ -12,7 +12,7 @@ import cn.heycloudream.ishua_backend.service.guard.BankAccessGuard;
 import cn.heycloudream.ishua_backend.util.TaskIdGenerator;
 import cn.heycloudream.ishua_backend.vo.ai.AiImportSubmitVO;
 import cn.heycloudream.ishua_backend.vo.ai.AiImportTaskMetaVO;
-import cn.heycloudream.streamtask.api.StreamTaskTemplate;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -23,10 +23,11 @@ import java.util.Locale;
 import java.util.Set;
 
 /**
- * 智能导入门面：负责入参校验、归属权校验、文件落盘、写元数据、入 Redis Stream。
+ * 智能导入门面：负责入参校验、归属权校验、文件落盘、写元数据、写任务状态。
  * <p>
  * 严格遵循 docs/Background.md 中的流程 A：Java 仅作为生产者，
  * 文档解析（MinerU）与大模型调用全部交给 ai-import-worker Worker。
+ * StreamTask 发布已暂时移除，后续恢复时在此处重新 publish。
  * </p>
  *
  * @author C1ouD
@@ -39,7 +40,7 @@ public class AiQuestionImportServiceImpl implements AiQuestionImportService {
     private static final Set<String> ALLOWED_IMPORT_EXTENSIONS = Set.of("txt", "pdf", "docx");
 
     private final FileStorageService fileStorageService;
-    private final StreamTaskTemplate streamTaskTemplate;
+
     private final AiImportTaskStatusStore taskStatusStore;
     private final AiImportTaskMetaStore taskMetaStore;
     private final AiImportTaskService aiImportTaskService;
@@ -87,7 +88,7 @@ public class AiQuestionImportServiceImpl implements AiQuestionImportService {
 
         aiImportTaskService.createOnSubmit(meta);
         taskMetaStore.write(taskId, meta);
-        streamTaskTemplate.publish("ai.import.file", taskId, meta);
+        // StreamTask 暂时移除，后续恢复时在此处重新 publish
         taskStatusStore.write(taskId, AiImportTaskStatus.SUBMITTED, null, null);
 
         log.info("[submitFileImport] 任务已提交 taskId={} bankId={} file={}", taskId, bankId, originalFilename);

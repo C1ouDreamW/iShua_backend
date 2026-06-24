@@ -8,7 +8,7 @@ import cn.heycloudream.ishua_backend.service.file.FileStorageService;
 import cn.heycloudream.ishua_backend.service.guard.BankAccessGuard;
 import cn.heycloudream.ishua_backend.vo.ai.AiImportSubmitVO;
 import cn.heycloudream.ishua_backend.vo.ai.AiImportTaskMetaVO;
-import cn.heycloudream.streamtask.api.StreamTaskTemplate;
+
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -32,9 +32,6 @@ class AiQuestionImportServiceImplTest {
     private FileStorageService fileStorageService;
 
     @Mock
-    private StreamTaskTemplate streamTaskTemplate;
-
-    @Mock
     private AiImportTaskStatusStore taskStatusStore;
 
     @Mock
@@ -50,7 +47,7 @@ class AiQuestionImportServiceImplTest {
     private AiQuestionImportServiceImpl service;
 
     @Test
-    void submitFileImport_shouldPublishStreamTaskEnvelope() throws IOException {
+    void submitFileImport_shouldSubmitTaskAndWriteMeta() throws IOException {
         MockMultipartFile file = new MockMultipartFile(
                 "file",
                 "demo.pdf",
@@ -62,16 +59,14 @@ class AiQuestionImportServiceImplTest {
 
         AiImportSubmitVO result = service.submitFileImport(1L, 10L, file);
 
-        ArgumentCaptor<String> taskTypeCaptor = ArgumentCaptor.forClass(String.class);
-        ArgumentCaptor<String> taskIdCaptor = ArgumentCaptor.forClass(String.class);
+        assertThat(result.getStatus()).isEqualTo(AiImportTaskStatus.SUBMITTED.name());
+        assertThat(result.getTaskId()).isNotNull();
+
         ArgumentCaptor<AiImportTaskMetaVO> metaCaptor = ArgumentCaptor.forClass(AiImportTaskMetaVO.class);
-        verify(streamTaskTemplate).publish(taskTypeCaptor.capture(), taskIdCaptor.capture(), metaCaptor.capture());
+        verify(taskMetaStore).write(eq(result.getTaskId()), metaCaptor.capture());
 
         AiImportTaskMetaVO meta = metaCaptor.getValue();
-        assertThat(taskTypeCaptor.getValue()).isEqualTo("ai.import.file");
-        assertThat(result.getStatus()).isEqualTo(AiImportTaskStatus.SUBMITTED.name());
-        assertThat(result.getTaskId()).isEqualTo(meta.getTaskId());
-        assertThat(taskIdCaptor.getValue()).isEqualTo(meta.getTaskId());
+        assertThat(meta.getTaskId()).isEqualTo(result.getTaskId());
         assertThat(meta.getUserId()).isEqualTo(1L);
         assertThat(meta.getBankId()).isEqualTo(10L);
         assertThat(meta.getFileName()).isEqualTo("demo.pdf");
@@ -81,7 +76,6 @@ class AiQuestionImportServiceImplTest {
         assertThat(meta.getSubmittedAt()).isPositive();
 
         verify(aiImportTaskService).createOnSubmit(any());
-        verify(taskMetaStore).write(eq(result.getTaskId()), any());
         verify(taskStatusStore).write(result.getTaskId(), AiImportTaskStatus.SUBMITTED, null, null);
     }
 }
