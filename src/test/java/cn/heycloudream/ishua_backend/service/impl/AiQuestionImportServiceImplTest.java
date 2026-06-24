@@ -8,20 +8,21 @@ import cn.heycloudream.ishua_backend.service.file.FileStorageService;
 import cn.heycloudream.ishua_backend.service.guard.BankAccessGuard;
 import cn.heycloudream.ishua_backend.vo.ai.AiImportSubmitVO;
 import cn.heycloudream.ishua_backend.vo.ai.AiImportTaskMetaVO;
-
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.redis.core.StreamOperations;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.mock.web.MockMultipartFile;
-
-import java.io.IOException;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -30,6 +31,15 @@ class AiQuestionImportServiceImplTest {
 
     @Mock
     private FileStorageService fileStorageService;
+
+    @Mock
+    private StringRedisTemplate stringRedisTemplate;
+
+    @Mock
+    private ObjectMapper objectMapper;
+
+    @Mock
+    private StreamOperations<String, Object, String> streamOperations;
 
     @Mock
     private AiImportTaskStatusStore taskStatusStore;
@@ -47,7 +57,8 @@ class AiQuestionImportServiceImplTest {
     private AiQuestionImportServiceImpl service;
 
     @Test
-    void submitFileImport_shouldSubmitTaskAndWriteMeta() throws IOException {
+    @SuppressWarnings("unchecked")
+    void submitFileImport_shouldSubmitTaskAndPublishStream() throws Exception {
         MockMultipartFile file = new MockMultipartFile(
                 "file",
                 "demo.pdf",
@@ -56,12 +67,18 @@ class AiQuestionImportServiceImplTest {
         );
 
         when(fileStorageService.store(file)).thenReturn("file:///tmp/demo.pdf");
+        when(stringRedisTemplate.opsForStream()).thenReturn((StreamOperations) streamOperations);
+        when(objectMapper.writeValueAsString(any())).thenReturn("{\"taskId\":\"mock\"}");
 
         AiImportSubmitVO result = service.submitFileImport(1L, 10L, file);
 
         assertThat(result.getStatus()).isEqualTo(AiImportTaskStatus.SUBMITTED.name());
         assertThat(result.getTaskId()).isNotNull();
 
+        // 验证 Redis Stream opsForStream 被调用（add + trim，各一次）
+        verify(stringRedisTemplate, times(2)).opsForStream();
+
+        // 验证元数据写入
         ArgumentCaptor<AiImportTaskMetaVO> metaCaptor = ArgumentCaptor.forClass(AiImportTaskMetaVO.class);
         verify(taskMetaStore).write(eq(result.getTaskId()), metaCaptor.capture());
 
