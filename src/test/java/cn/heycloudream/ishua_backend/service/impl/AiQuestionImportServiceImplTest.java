@@ -4,25 +4,24 @@ import cn.heycloudream.ishua_backend.enums.AiImportTaskStatus;
 import cn.heycloudream.ishua_backend.service.AiImportTaskService;
 import cn.heycloudream.ishua_backend.service.ai.AiImportTaskMetaStore;
 import cn.heycloudream.ishua_backend.service.ai.AiImportTaskStatusStore;
+import cn.heycloudream.ishua_backend.service.ai.RedisStreamTaskDispatcher;
 import cn.heycloudream.ishua_backend.service.file.FileStorageService;
 import cn.heycloudream.ishua_backend.service.guard.BankAccessGuard;
 import cn.heycloudream.ishua_backend.vo.ai.AiImportSubmitVO;
 import cn.heycloudream.ishua_backend.vo.ai.AiImportTaskMetaVO;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.data.redis.core.StreamOperations;
-import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.mock.web.MockMultipartFile;
+
+import java.io.IOException;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -33,13 +32,7 @@ class AiQuestionImportServiceImplTest {
     private FileStorageService fileStorageService;
 
     @Mock
-    private StringRedisTemplate stringRedisTemplate;
-
-    @Mock
-    private ObjectMapper objectMapper;
-
-    @Mock
-    private StreamOperations<String, Object, String> streamOperations;
+    private RedisStreamTaskDispatcher taskDispatcher;
 
     @Mock
     private AiImportTaskStatusStore taskStatusStore;
@@ -57,8 +50,7 @@ class AiQuestionImportServiceImplTest {
     private AiQuestionImportServiceImpl service;
 
     @Test
-    @SuppressWarnings("unchecked")
-    void submitFileImport_shouldSubmitTaskAndPublishStream() throws Exception {
+    void submitFileImport_shouldSubmitTaskAndDispatchToStream() throws IOException {
         MockMultipartFile file = new MockMultipartFile(
                 "file",
                 "demo.pdf",
@@ -67,32 +59,29 @@ class AiQuestionImportServiceImplTest {
         );
 
         when(fileStorageService.store(file)).thenReturn("file:///tmp/demo.pdf");
-        when(stringRedisTemplate.opsForStream()).thenReturn((StreamOperations) streamOperations);
-        when(objectMapper.writeValueAsString(any())).thenReturn("{\"taskId\":\"mock\"}");
 
         AiImportSubmitVO result = service.submitFileImport(1L, 10L, file);
 
         assertThat(result.getStatus()).isEqualTo(AiImportTaskStatus.SUBMITTED.name());
         assertThat(result.getTaskId()).isNotNull();
 
-        // 验证 Redis Stream opsForStream 被调用（add + trim，各一次）
-        verify(stringRedisTemplate, times(2)).opsForStream();
+        // 验证 Dispatcher 被调用
+        ArgumentCaptor<AiImportTaskMetaVO> dispatchCaptor = ArgumentCaptor.forClass(AiImportTaskMetaVO.class);
+        verify(taskDispatcher).dispatch(dispatchCaptor.capture());
 
-        // 验证元数据写入
-        ArgumentCaptor<AiImportTaskMetaVO> metaCaptor = ArgumentCaptor.forClass(AiImportTaskMetaVO.class);
-        verify(taskMetaStore).write(eq(result.getTaskId()), metaCaptor.capture());
+        AiImportTaskMetaVO dispatchedMeta = dispatchCaptor.getValue();
+        assertThat(dispatchedMeta.getTaskId()).isEqualTo(result.getTaskId());
+        assertThat(dispatchedMeta.getUserId()).isEqualTo(1L);
+        assertThat(dispatchedMeta.getBankId()).isEqualTo(10L);
+        assertThat(dispatchedMeta.getFileName()).isEqualTo("demo.pdf");
+        assertThat(dispatchedMeta.getFileUrl()).isEqualTo("file:///tmp/demo.pdf");
+        assertThat(dispatchedMeta.getFileSize()).isEqualTo(file.getSize());
+        assertThat(dispatchedMeta.getType()).isEqualTo("file");
+        assertThat(dispatchedMeta.getSubmittedAt()).isPositive();
 
-        AiImportTaskMetaVO meta = metaCaptor.getValue();
-        assertThat(meta.getTaskId()).isEqualTo(result.getTaskId());
-        assertThat(meta.getUserId()).isEqualTo(1L);
-        assertThat(meta.getBankId()).isEqualTo(10L);
-        assertThat(meta.getFileName()).isEqualTo("demo.pdf");
-        assertThat(meta.getFileUrl()).isEqualTo("file:///tmp/demo.pdf");
-        assertThat(meta.getFileSize()).isEqualTo(file.getSize());
-        assertThat(meta.getType()).isEqualTo("file");
-        assertThat(meta.getSubmittedAt()).isPositive();
-
+        // 验证其他组件调用
         verify(aiImportTaskService).createOnSubmit(any());
+        verify(taskMetaStore).write(eq(result.getTaskId()), any());
         verify(taskStatusStore).write(result.getTaskId(), AiImportTaskStatus.SUBMITTED, null, null);
     }
 }

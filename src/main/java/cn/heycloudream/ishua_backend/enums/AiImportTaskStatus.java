@@ -42,7 +42,7 @@ public enum AiImportTaskStatus {
      */
     public boolean canTransitionTo(AiImportTaskStatus target) {
         return switch (this) {
-            case SUBMITTED -> target == PROCESSING || target == FAILED;
+            case SUBMITTED -> target == PROCESSING || target == PARSED || target == FAILED;
             case PROCESSING -> target == PARSED || target == FAILED;
             case PARSED -> target == IMPORTING || target == IMPORTED || target == FAILED || target == EXPIRED;
             case IMPORTING -> target == IMPORTED || target == FAILED;

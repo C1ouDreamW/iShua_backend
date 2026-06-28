@@ -129,6 +129,8 @@ class LLMClient:
             if array_match:
                 cleaned = array_match.group(0).strip()
 
+        # 清除 JSON 标准不允许的控制字符（\x00-\x1f 中除 \n \r \t 外）
+        cleaned = re.sub(r"[\x00-\x08\x0b\x0c\x0e-\x1f\x7f]", "", cleaned)
         data = json.loads(cleaned)
         if not isinstance(data, list):
             raise ValueError("LLM result must be a JSON array")
