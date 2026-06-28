@@ -19,9 +19,11 @@ _DEFAULT_SYSTEM_PROMPT_FILE = _PROMPTS_DIR / "ai-import-system.txt"
 
 _FALLBACK_SYSTEM_PROMPT = """你是「非结构化文本 → 结构化题库」解析引擎。
 【输出格式】只输出合法 JSON 数组，禁止 Markdown 代码块与说明文字。
-每个元素必须且只能包含：questionType、stem、options、answer、analysis。
+每个元素必须且只能包含：questionType、stem、options、answer、analysis、answerSource。
 questionType 只能是 SINGLE、MULTI、JUDGE、SHORT_ANSWER。
-answer 必须为非空字符串数组；判断题 options 固定为 ["正确","错误"]，answer 为 ["T"] 或 ["F"]。
+answerSource 只能是 ORIGINAL（原文有答案）或 MISSING（原文无答案）。
+answerSource 为 ORIGINAL 时 answer 必须为非空字符串数组；为 MISSING 时 answer 必须为 []。
+判断题 options 固定为 ["正确","错误"]，answer 为 ["T"] 或 ["F"]。
 无法识别的题块静默丢弃；整段非题库则输出 []。
 """
 
@@ -139,6 +141,7 @@ class LLMClient:
     @staticmethod
     def _validate_llm_shape(value: List[Dict[str, Any]]) -> None:
         required_keys = {"questionType", "stem", "options", "answer", "analysis"}
+        valid_sources = {"ORIGINAL", "MISSING"}
         for index, item in enumerate(value):
             if not isinstance(item, dict):
                 raise ValueError(f"Question at index {index} must be an object")
@@ -156,7 +159,23 @@ class LLMClient:
                 raise ValueError(f"options at index {index} must be [] for SHORT_ANSWER")
             if not isinstance(item["options"], list):
                 raise ValueError(f"options at index {index} must be an array")
-            if not isinstance(item["answer"], list) or not item["answer"]:
-                raise ValueError(f"answer at index {index} must be a non-empty array")
+            if not isinstance(item["answer"], list):
+                raise ValueError(f"answer at index {index} must be an array")
+            # answerSource 缺省视为 ORIGINAL（兼容历史提示词输出）
+            answer_source = str(item.get("answerSource") or "ORIGINAL").strip().upper()
+            if answer_source not in valid_sources:
+                raise ValueError(
+                    f"answerSource at index {index} must be ORIGINAL or MISSING, got: {answer_source}"
+                )
+            if answer_source == "MISSING":
+                if item["answer"]:
+                    raise ValueError(
+                        f"answer at index {index} must be [] when answerSource is MISSING"
+                    )
+            else:
+                if not item["answer"]:
+                    raise ValueError(
+                        f"answer at index {index} must be a non-empty array when answerSource is ORIGINAL"
+                    )
             if not isinstance(item["analysis"], str):
                 raise ValueError(f"analysis at index {index} must be a string")
