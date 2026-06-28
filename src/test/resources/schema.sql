@@ -44,6 +44,8 @@ CREATE TABLE question (
     stem             CLOB         NOT NULL,
     options_json     VARCHAR(4000),
     answer_json      VARCHAR(1000),
+    answer_source    VARCHAR(16)  DEFAULT 'ORIGINAL',
+    answer_confidence VARCHAR(16) DEFAULT NULL,
     analysis         CLOB,
     raw_llm_json     CLOB,
     sort_no          INT          NOT NULL DEFAULT 0,

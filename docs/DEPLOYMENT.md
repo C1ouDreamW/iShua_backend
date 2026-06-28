@@ -52,6 +52,7 @@ mysql -h 127.0.0.1 -P 3306 -u root -p ishua_backend < sql/schema/init_core_table
 
 - `ai_import_task.sql`
 - `ai_import_task_add_pipeline_metrics.sql`
+- `question_add_answer_source.sql`
 
 全新部署优先使用 `init_core_tables.sql`，该脚本已经包含用户、题库、AI 导入任务、试题和错题本表。
 

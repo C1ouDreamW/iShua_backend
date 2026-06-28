@@ -9,12 +9,12 @@ INSERT INTO bank_node (id, user_id, parent_id, node_kind, title, description, is
 VALUES (1, 1, NULL, 'LEAF', 'H2 测试公开题库', '轨道 A 集成测试用公开题库', 1, 0, 2,
         CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 0);
 
-INSERT INTO question (question_bank_id, question_type, stem, options_json, answer_json, analysis, sort_no,
+INSERT INTO question (question_bank_id, question_type, stem, options_json, answer_json, answer_source, analysis, sort_no,
                       create_time, update_time, is_deleted)
-VALUES (1, 'SINGLE', 'HTTP 默认端口是？', '["21", "80", "443"]', '["B"]', 'HTTP 默认 80', 1,
+VALUES (1, 'SINGLE', 'HTTP 默认端口是？', '["21", "80", "443"]', '["B"]', 'ORIGINAL', 'HTTP 默认 80', 1,
         CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 0);
 
-INSERT INTO question (question_bank_id, question_type, stem, options_json, answer_json, analysis, sort_no,
+INSERT INTO question (question_bank_id, question_type, stem, options_json, answer_json, answer_source, analysis, sort_no,
                       create_time, update_time, is_deleted)
-VALUES (1, 'SINGLE', 'TCP 属于 OSI 哪一层？', '["网络层", "传输层", "应用层"]', '["B"]', 'TCP 在传输层', 2,
+VALUES (1, 'SINGLE', 'TCP 属于 OSI 哪一层？', '["网络层", "传输层", "应用层"]', '["B"]', 'ORIGINAL', 'TCP 在传输层', 2,
         CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 0);

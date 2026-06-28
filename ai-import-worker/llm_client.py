@@ -140,7 +140,7 @@ class LLMClient:
 
     @staticmethod
     def _validate_llm_shape(value: List[Dict[str, Any]]) -> None:
-        required_keys = {"questionType", "stem", "options", "answer", "analysis"}
+        required_keys = {"questionType", "stem", "options", "answer", "analysis", "answerSource"}
         valid_sources = {"ORIGINAL", "MISSING"}
         for index, item in enumerate(value):
             if not isinstance(item, dict):
@@ -161,8 +161,7 @@ class LLMClient:
                 raise ValueError(f"options at index {index} must be an array")
             if not isinstance(item["answer"], list):
                 raise ValueError(f"answer at index {index} must be an array")
-            # answerSource 缺省视为 ORIGINAL（兼容历史提示词输出）
-            answer_source = str(item.get("answerSource") or "ORIGINAL").strip().upper()
+            answer_source = str(item["answerSource"]).strip().upper()
             if answer_source not in valid_sources:
                 raise ValueError(
                     f"answerSource at index {index} must be ORIGINAL or MISSING, got: {answer_source}"

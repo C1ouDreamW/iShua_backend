@@ -46,4 +46,18 @@ public class QuestionPreviewVO {
 
     @Schema(description = "题目解析")
     private String analysis;
+
+    /**
+     * 答案来源：ORIGINAL（原文有答案）/ MISSING（原文无答案）/ AI_GENERATED（AI 解答生成）。
+     * <p>
+     * 缺省视为 ORIGINAL，兼容历史 LLM 输出与旧版 preview_json。
+     */
+    @Schema(description = "答案来源：ORIGINAL/MISSING/AI_GENERATED", example = "ORIGINAL")
+    private String answerSource;
+
+    /**
+     * 答案置信度：HIGH/MEDIUM/LOW。仅 AI 解答流程写入，阶段 1 始终为 null。
+     */
+    @Schema(description = "答案置信度：HIGH/MEDIUM/LOW（仅 AI 解答写入）")
+    private String answerConfidence;
 }

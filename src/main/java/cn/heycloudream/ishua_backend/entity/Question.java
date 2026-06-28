@@ -55,6 +55,16 @@ public class Question {
     private String answerJson;
 
     /**
+     * 答案来源：ORIGINAL（原文）/ MISSING（原文无答案）/ AI_GENERATED（AI 解答）。
+     */
+    private String answerSource;
+
+    /**
+     * 答案置信度：HIGH/MEDIUM/LOW。仅 AI 解答写入，否则为 null。
+     */
+    private String answerConfidence;
+
+    /**
      * 解析。
      */
     private String analysis;

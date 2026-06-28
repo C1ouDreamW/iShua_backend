@@ -52,137 +52,152 @@ VALUES (3, 1, NULL, 'LEAF', '高等数学（上）错题重刷集', '个人整�
 -- ============================================
 
 -- 单选题 1
-INSERT INTO `question` (`question_bank_id`, `question_type`, `stem`, `options_json`, `answer_json`, `analysis`, `sort_no`, `create_time`, `update_time`)
+INSERT INTO `question` (`question_bank_id`, `question_type`, `stem`, `options_json`, `answer_json`, `answer_source`, `analysis`, `sort_no`, `create_time`, `update_time`)
 VALUES (1, 'SINGLE',
         '在 OSI 七层模型中，哪一层负责路由选择与拥塞控制？',
         '["物理层", "数据链路层", "网络层", "传输层"]',
         '["C"]',
+        'ORIGINAL',
         '网络层负责分组转发、路由选择与拥塞控制。IP 协议即工作在这一层。',
         1, NOW(), NOW());
 
 -- 单选题 2
-INSERT INTO `question` (`question_bank_id`, `question_type`, `stem`, `options_json`, `answer_json`, `analysis`, `sort_no`, `create_time`, `update_time`)
+INSERT INTO `question` (`question_bank_id`, `question_type`, `stem`, `options_json`, `answer_json`, `answer_source`, `analysis`, `sort_no`, `create_time`, `update_time`)
 VALUES (1, 'SINGLE',
         'TCP 协议通过什么机制保证可靠传输？',
         '["仅通过校验和", "确认应答 + 超时重传", "仅通过序列号", "通过 IP 层的可靠传输"]',
         '["B"]',
+        'ORIGINAL',
         'TCP 通过序列号、确认应答（ACK）、超时重传、流量控制和拥塞控制等机制共同保证可靠传输。',
         2, NOW(), NOW());
 
 -- 单选题 3
-INSERT INTO `question` (`question_bank_id`, `question_type`, `stem`, `options_json`, `answer_json`, `analysis`, `sort_no`, `create_time`, `update_time`)
+INSERT INTO `question` (`question_bank_id`, `question_type`, `stem`, `options_json`, `answer_json`, `answer_source`, `analysis`, `sort_no`, `create_time`, `update_time`)
 VALUES (1, 'SINGLE',
         'HTTP 协议默认使用哪个端口？',
         '["21", "25", "80", "443"]',
         '["C"]',
+        'ORIGINAL',
         'HTTP 默认端口为 80，HTTPS 默认端口为 443。FTP 使用 21，SMTP 使用 25。',
         3, NOW(), NOW());
 
 -- 单选题 4
-INSERT INTO `question` (`question_bank_id`, `question_type`, `stem`, `options_json`, `answer_json`, `analysis`, `sort_no`, `create_time`, `update_time`)
+INSERT INTO `question` (`question_bank_id`, `question_type`, `stem`, `options_json`, `answer_json`, `answer_source`, `analysis`, `sort_no`, `create_time`, `update_time`)
 VALUES (1, 'SINGLE',
         '以下哪个 IP 地址属于私有地址？',
         '["8.8.8.8", "172.16.5.10", "202.112.144.30", "114.114.114.114"]',
         '["B"]',
+        'ORIGINAL',
         '172.16.0.0 ~ 172.31.255.255 是 B 类私有地址段。8.8.8.8 是 Google 公共 DNS，其余为公网地址。',
         4, NOW(), NOW());
 
 -- 单选题 5
-INSERT INTO `question` (`question_bank_id`, `question_type`, `stem`, `options_json`, `answer_json`, `analysis`, `sort_no`, `create_time`, `update_time`)
+INSERT INTO `question` (`question_bank_id`, `question_type`, `stem`, `options_json`, `answer_json`, `answer_source`, `analysis`, `sort_no`, `create_time`, `update_time`)
 VALUES (1, 'SINGLE',
         'DNS 服务的主要功能是什么？',
         '["分配 IP 地址", "域名到 IP 地址的解析", "加密数据传输", "检测网络故障"]',
         '["B"]',
+        'ORIGINAL',
         'DNS（Domain Name System）的核心功能是将人类可读的域名（如 www.example.com）解析为机器可路由的 IP 地址。',
         5, NOW(), NOW());
 
 -- 多选题 6
-INSERT INTO `question` (`question_bank_id`, `question_type`, `stem`, `options_json`, `answer_json`, `analysis`, `sort_no`, `create_time`, `update_time`)
+INSERT INTO `question` (`question_bank_id`, `question_type`, `stem`, `options_json`, `answer_json`, `answer_source`, `analysis`, `sort_no`, `create_time`, `update_time`)
 VALUES (1, 'MULTI',
         '以下哪些协议工作在传输层？',
         '["TCP", "UDP", "IP", "ICMP"]',
         '["A", "B"]',
+        'ORIGINAL',
         'TCP 和 UDP 是传输层协议。IP 是网络层协议，ICMP 也属于网络层。',
         6, NOW(), NOW());
 
 -- 多选题 7
-INSERT INTO `question` (`question_bank_id`, `question_type`, `stem`, `options_json`, `answer_json`, `analysis`, `sort_no`, `create_time`, `update_time`)
+INSERT INTO `question` (`question_bank_id`, `question_type`, `stem`, `options_json`, `answer_json`, `answer_source`, `analysis`, `sort_no`, `create_time`, `update_time`)
 VALUES (1, 'MULTI',
         '以下关于 TCP 三次握手的说法，正确的有哪些？',
         '["第一次握手：客户端发送 SYN 包", "第二次握手：服务端回复 SYN-ACK 包", "第三次握手：客户端发送 ACK 包", "握手完成后直接进入 CLOSED 状态"]',
         '["A", "B", "C"]',
+        'ORIGINAL',
         '三次握手：客户端 SYN → 服务端 SYN-ACK → 客户端 ACK，完成后进入 ESTABLISHED 状态，不是 CLOSED。',
         7, NOW(), NOW());
 
 -- 判断题 8
-INSERT INTO `question` (`question_bank_id`, `question_type`, `stem`, `options_json`, `answer_json`, `analysis`, `sort_no`, `create_time`, `update_time`)
+INSERT INTO `question` (`question_bank_id`, `question_type`, `stem`, `options_json`, `answer_json`, `answer_source`, `analysis`, `sort_no`, `create_time`, `update_time`)
 VALUES (1, 'JUDGE',
         'UDP 协议提供面向连接的可靠数据传输服务。',
         '["正确", "错误"]',
         '["F"]',
+        'ORIGINAL',
         'UDP 是无连接的、尽最大努力交付的不可靠传输协议。提供面向连接可靠传输的是 TCP。',
         8, NOW(), NOW());
 
 -- 判断题 9
-INSERT INTO `question` (`question_bank_id`, `question_type`, `stem`, `options_json`, `answer_json`, `analysis`, `sort_no`, `create_time`, `update_time`)
+INSERT INTO `question` (`question_bank_id`, `question_type`, `stem`, `options_json`, `answer_json`, `answer_source`, `analysis`, `sort_no`, `create_time`, `update_time`)
 VALUES (1, 'JUDGE',
         'ARP 协议用于将 IP 地址解析为 MAC 地址。',
         '["正确", "错误"]',
         '["T"]',
+        'ORIGINAL',
         'ARP（Address Resolution Protocol）正是用于在局域网中将 IP 地址映射为对应的硬件 MAC 地址。',
         9, NOW(), NOW());
 
 -- 单选题 10
-INSERT INTO `question` (`question_bank_id`, `question_type`, `stem`, `options_json`, `answer_json`, `analysis`, `sort_no`, `create_time`, `update_time`)
+INSERT INTO `question` (`question_bank_id`, `question_type`, `stem`, `options_json`, `answer_json`, `answer_source`, `analysis`, `sort_no`, `create_time`, `update_time`)
 VALUES (1, 'SINGLE',
         'IPv4 地址的总长度是多少位？',
         '["16 位", "32 位", "64 位", "128 位"]',
         '["B"]',
+        'ORIGINAL',
         'IPv4 地址由 32 位二进制组成，通常表示为 4 个十进制数（如 192.168.1.1）。IPv6 地址为 128 位。',
         10, NOW(), NOW());
 
 -- 单选题 11
-INSERT INTO `question` (`question_bank_id`, `question_type`, `stem`, `options_json`, `answer_json`, `analysis`, `sort_no`, `create_time`, `update_time`)
+INSERT INTO `question` (`question_bank_id`, `question_type`, `stem`, `options_json`, `answer_json`, `answer_source`, `analysis`, `sort_no`, `create_time`, `update_time`)
 VALUES (1, 'SINGLE',
         'HTTP 状态码 404 表示什么？',
         '["服务器内部错误", "请求的资源未找到", "请求未授权", "请求成功"]',
         '["B"]',
+        'ORIGINAL',
         '404 Not Found 表示服务器无法找到请求的资源。500 是服务器内部错误，401 是未授权，200 是成功。',
         11, NOW(), NOW());
 
 -- 单选题 12
-INSERT INTO `question` (`question_bank_id`, `question_type`, `stem`, `options_json`, `answer_json`, `analysis`, `sort_no`, `create_time`, `update_time`)
+INSERT INTO `question` (`question_bank_id`, `question_type`, `stem`, `options_json`, `answer_json`, `answer_source`, `analysis`, `sort_no`, `create_time`, `update_time`)
 VALUES (1, 'SINGLE',
         '在浏览器中输入网址并回车后，最先发生的第一步是什么？',
         '["建立 TCP 连接", "DNS 解析域名", "发送 HTTP 请求", "渲染页面"]',
         '["B"]',
+        'ORIGINAL',
         '浏览器首先检查本地缓存，若未命中则向 DNS 服务器发起域名解析请求，获得 IP 地址后才进行 TCP 连接等后续步骤。',
         12, NOW(), NOW());
 
 -- 多选题 13
-INSERT INTO `question` (`question_bank_id`, `question_type`, `stem`, `options_json`, `answer_json`, `analysis`, `sort_no`, `create_time`, `update_time`)
+INSERT INTO `question` (`question_bank_id`, `question_type`, `stem`, `options_json`, `answer_json`, `answer_source`, `analysis`, `sort_no`, `create_time`, `update_time`)
 VALUES (1, 'MULTI',
         '以下哪些是应用层协议？',
         '["HTTP", "FTP", "SMTP", "TCP"]',
         '["A", "B", "C"]',
+        'ORIGINAL',
         'HTTP、FTP、SMTP 都属于应用层协议。TCP 是传输层协议，为应用层提供传输服务。',
         13, NOW(), NOW());
 
 -- 判断题 14
-INSERT INTO `question` (`question_bank_id`, `question_type`, `stem`, `options_json`, `answer_json`, `analysis`, `sort_no`, `create_time`, `update_time`)
+INSERT INTO `question` (`question_bank_id`, `question_type`, `stem`, `options_json`, `answer_json`, `answer_source`, `analysis`, `sort_no`, `create_time`, `update_time`)
 VALUES (1, 'JUDGE',
         '子网掩码 255.255.255.0 表示前 24 位为网络地址部分。',
         '["正确", "错误"]',
         '["T"]',
+        'ORIGINAL',
         '子网掩码 255.255.255.0（即 /24）表示 IP 地址的前 24 位用于标识网络，后 8 位用于标识主机。',
         14, NOW(), NOW());
 
 -- 单选题 15
-INSERT INTO `question` (`question_bank_id`, `question_type`, `stem`, `options_json`, `answer_json`, `analysis`, `sort_no`, `create_time`, `update_time`)
+INSERT INTO `question` (`question_bank_id`, `question_type`, `stem`, `options_json`, `answer_json`, `answer_source`, `analysis`, `sort_no`, `create_time`, `update_time`)
 VALUES (1, 'SINGLE',
         'TCP 头部中用于流量控制的字段是什么？',
         '["序列号", "确认号", "窗口大小", "校验和"]',
         '["C"]',
+        'ORIGINAL',
         '窗口大小（Window Size）字段用于 TCP 流量控制，告知发送方接收方当前可用的接收缓冲区大小。',
         15, NOW(), NOW());
 
@@ -190,43 +205,48 @@ VALUES (1, 'SINGLE',
 -- 4. 试题 — 题库 B（数据结构与算法，5 题）
 -- ============================================
 
-INSERT INTO `question` (`question_bank_id`, `question_type`, `stem`, `options_json`, `answer_json`, `analysis`, `sort_no`, `create_time`, `update_time`)
+INSERT INTO `question` (`question_bank_id`, `question_type`, `stem`, `options_json`, `answer_json`, `answer_source`, `analysis`, `sort_no`, `create_time`, `update_time`)
 VALUES (2, 'SINGLE',
         '在单链表中删除一个节点，需要修改几个指针？',
         '["0 个", "1 个", "2 个", "视位置而定"]',
         '["B"]',
+        'ORIGINAL',
         '删除单链表中某个节点，只需将其前驱节点的 next 指针指向被删节点的后继即可，修改 1 个指针。',
         1, NOW(), NOW());
 
-INSERT INTO `question` (`question_bank_id`, `question_type`, `stem`, `options_json`, `answer_json`, `analysis`, `sort_no`, `create_time`, `update_time`)
+INSERT INTO `question` (`question_bank_id`, `question_type`, `stem`, `options_json`, `answer_json`, `answer_source`, `analysis`, `sort_no`, `create_time`, `update_time`)
 VALUES (2, 'SINGLE',
         '快速排序的平均时间复杂度是？',
         '["O(n)", "O(n log n)", "O(n²)", "O(log n)"]',
         '["B"]',
+        'ORIGINAL',
         '快速排序平均时间复杂度为 O(n log n)，最坏情况为 O(n²)（如每次划分极不均衡）。',
         2, NOW(), NOW());
 
-INSERT INTO `question` (`question_bank_id`, `question_type`, `stem`, `options_json`, `answer_json`, `analysis`, `sort_no`, `create_time`, `update_time`)
+INSERT INTO `question` (`question_bank_id`, `question_type`, `stem`, `options_json`, `answer_json`, `answer_source`, `analysis`, `sort_no`, `create_time`, `update_time`)
 VALUES (2, 'SINGLE',
         '栈的特点是？',
         '["先进先出", "先进后出", "随机存取", "按值存取"]',
         '["B"]',
+        'ORIGINAL',
         '栈是 LIFO（Last In First Out）结构，即先进后出。队列才是 FIFO（First In First Out）。',
         3, NOW(), NOW());
 
-INSERT INTO `question` (`question_bank_id`, `question_type`, `stem`, `options_json`, `answer_json`, `analysis`, `sort_no`, `create_time`, `update_time`)
+INSERT INTO `question` (`question_bank_id`, `question_type`, `stem`, `options_json`, `answer_json`, `answer_source`, `analysis`, `sort_no`, `create_time`, `update_time`)
 VALUES (2, 'SINGLE',
         '二叉搜索树中，左子树所有节点的值均满足什么条件？',
         '["大于根节点值", "小于根节点值", "等于根节点值", "无特定关系"]',
         '["B"]',
+        'ORIGINAL',
         '二叉搜索树（BST）的性质：左子树所有节点值 < 根节点值 < 右子树所有节点值。',
         4, NOW(), NOW());
 
-INSERT INTO `question` (`question_bank_id`, `question_type`, `stem`, `options_json`, `answer_json`, `analysis`, `sort_no`, `create_time`, `update_time`)
+INSERT INTO `question` (`question_bank_id`, `question_type`, `stem`, `options_json`, `answer_json`, `answer_source`, `analysis`, `sort_no`, `create_time`, `update_time`)
 VALUES (2, 'SINGLE',
         '广度优先搜索（BFS）通常使用什么数据结构实现？',
         '["栈", "队列", "堆", "哈希表"]',
         '["B"]',
+        'ORIGINAL',
         'BFS 使用队列逐层遍历。DFS 使用栈（或递归）实现深度优先。',
         5, NOW(), NOW());
 
@@ -234,19 +254,21 @@ VALUES (2, 'SINGLE',
 -- 5. 试题 — 题库 C（私有高数题库，2 题）
 -- ============================================
 
-INSERT INTO `question` (`question_bank_id`, `question_type`, `stem`, `options_json`, `answer_json`, `analysis`, `sort_no`, `create_time`, `update_time`)
+INSERT INTO `question` (`question_bank_id`, `question_type`, `stem`, `options_json`, `answer_json`, `answer_source`, `analysis`, `sort_no`, `create_time`, `update_time`)
 VALUES (3, 'SINGLE',
         '函数 f(x) = x² 在 x=1 处的导数 f\'(1) 等于？',
         '["0", "1", "2", "3"]',
         '["C"]',
+        'ORIGINAL',
         'f\'(x) = 2x，代入 x=1 得 f\'(1) = 2。',
         1, NOW(), NOW());
 
-INSERT INTO `question` (`question_bank_id`, `question_type`, `stem`, `options_json`, `answer_json`, `analysis`, `sort_no`, `create_time`, `update_time`)
+INSERT INTO `question` (`question_bank_id`, `question_type`, `stem`, `options_json`, `answer_json`, `answer_source`, `analysis`, `sort_no`, `create_time`, `update_time`)
 VALUES (3, 'SINGLE',
         '∫₀¹ x dx 的值为？',
         '["0", "0.5", "1", "2"]',
         '["B"]',
+        'ORIGINAL',
         '∫ x dx = x²/2，从 0 到 1 代入得 1²/2 - 0²/2 = 0.5。',
         2, NOW(), NOW());
 

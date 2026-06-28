@@ -43,6 +43,12 @@ public class QuestionVO {
             example = "[\"C\"]")
     private String answerJson;
 
+    @Schema(description = "答案来源：ORIGINAL/MISSING/AI_GENERATED", example = "ORIGINAL")
+    private String answerSource;
+
+    @Schema(description = "答案置信度：HIGH/MEDIUM/LOW（仅 AI 解答写入）")
+    private String answerConfidence;
+
     @Schema(description = "题目解析")
     private String analysis;
 

@@ -79,6 +79,8 @@ CREATE TABLE `question` (
   `stem` LONGTEXT NOT NULL COMMENT 'question stem',
   `options_json` JSON DEFAULT NULL COMMENT 'options json',
   `answer_json` JSON DEFAULT NULL COMMENT 'answer json',
+  `answer_source` VARCHAR(16) NULL DEFAULT 'ORIGINAL' COMMENT '答案来源: ORIGINAL/MISSING/AI_GENERATED',
+  `answer_confidence` VARCHAR(16) NULL DEFAULT NULL COMMENT '答案置信度: HIGH/MEDIUM/LOW',
   `analysis` LONGTEXT DEFAULT NULL COMMENT 'analysis',
   `raw_llm_json` LONGTEXT DEFAULT NULL COMMENT 'raw llm json backup',
   `sort_no` INT NOT NULL DEFAULT 0 COMMENT 'sort number',

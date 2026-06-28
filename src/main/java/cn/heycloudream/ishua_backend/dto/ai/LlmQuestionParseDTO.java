@@ -29,4 +29,15 @@ public class LlmQuestionParseDTO {
     private List<String> answer;
 
     private String analysis;
+
+    /**
+     * 答案来源：ORIGINAL（原文有答案）/ MISSING（原文无答案）。
+     * 缺省视为 ORIGINAL，兼容旧版提示词输出。
+     */
+    private String answerSource;
+
+    /**
+     * 答案置信度：HIGH/MEDIUM/LOW。仅 AI 解答流程写入。
+     */
+    private String answerConfidence;
 }
