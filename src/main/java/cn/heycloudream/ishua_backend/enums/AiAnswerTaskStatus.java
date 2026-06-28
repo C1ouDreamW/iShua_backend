@@ -3,7 +3,7 @@ package cn.heycloudream.ishua_backend.enums;
 import java.util.Arrays;
 
 /**
- * AI 解答任务生命周期状态（阶段 2）。
+ * AI 解答任务生命周期状态。
  *
  * @author C1ouD
  */

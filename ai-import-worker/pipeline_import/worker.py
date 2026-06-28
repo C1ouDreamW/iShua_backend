@@ -5,10 +5,10 @@ import time
 from typing import Any, Dict
 
 from config import settings
-from debug_artifacts import create_task_debug_dir, save_debug_text
-from llm_client import LLMClient
-from mineru_client import MinerUClient
-from redis_manager import RedisManager
+from shared.debug_artifacts import create_task_debug_dir, save_debug_text
+from pipeline_import.llm_client import LLMClient
+from pipeline_import.mineru_client import MinerUClient
+from pipeline_import.redis_manager import RedisManager
 
 
 logger = logging.getLogger(__name__)

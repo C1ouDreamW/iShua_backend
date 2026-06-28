@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 import java.time.LocalDateTime;
 
 /**
- * AI 解答任务持久化实体，对应数据库表 {@code ai_answer_task}（阶段 2）。
+ * AI 解答任务持久化实体，对应数据库表 {@code ai_answer_task}。
  *
  * @author C1ouD
  */

@@ -15,7 +15,7 @@ import java.util.Optional;
 import java.util.Set;
 
 /**
- * 解答任务看门狗（阶段 2）：定时扫描长期 PROCESSING 的解答任务，标记 FAILED。
+ * 解答任务看门狗：定时扫描长期 PROCESSING 的解答任务，标记 FAILED。
  * <p>
  * 与 {@link AiImportTaskWatchdog} 物理隔离：扫描 {@code ishua:answer:status:*}，
  * 使用独立锁 {@code ishua:answer:watchdog:lock}。

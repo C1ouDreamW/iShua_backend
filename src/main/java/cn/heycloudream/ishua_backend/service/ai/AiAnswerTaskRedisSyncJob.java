@@ -16,7 +16,7 @@ import java.util.Optional;
 import java.util.Set;
 
 /**
- * 将 Python 解答 Worker 写入 Redis 的任务状态同步到 MySQL（阶段 2）。
+ * 将 Python 解答 Worker 写入 Redis 的任务状态同步到 MySQL。
  * <p>
  * 与 {@link AiImportTaskRedisSyncJob} 物理隔离：扫描 {@code ishua:answer:status:*}。
  * </p>

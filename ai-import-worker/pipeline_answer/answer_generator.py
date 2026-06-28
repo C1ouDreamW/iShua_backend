@@ -1,4 +1,4 @@
-"""阶段 2 AI 解答核心算法：分片 + 多次投票。
+""" AI 解答核心算法：分片 + 多次投票。
 
 仅处理 SINGLE/MULTI/JUDGE 三类客观题；SHORT_ANSWER 不进入此流程。
 
@@ -24,7 +24,7 @@ from config import settings
 
 logger = logging.getLogger(__name__)
 
-_PROMPTS_DIR = Path(__file__).resolve().parent / "prompts"
+_PROMPTS_DIR = Path(__file__).resolve().parent.parent / "prompts"
 _DEFAULT_SYSTEM_PROMPT_FILE = _PROMPTS_DIR / "ai-answer-system.txt"
 
 _LETTER = re.compile(r"^[A-Z]$")
@@ -36,7 +36,7 @@ def _resolve_system_prompt_path() -> Path:
     if configured:
         path = Path(configured)
         if not path.is_absolute():
-            path = Path(__file__).resolve().parent / path
+            path = Path(__file__).resolve().parent.parent / path
         return path.resolve()
     return _DEFAULT_SYSTEM_PROMPT_FILE.resolve()
 

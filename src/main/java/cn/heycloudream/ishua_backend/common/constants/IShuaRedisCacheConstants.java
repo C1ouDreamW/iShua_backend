@@ -100,15 +100,15 @@ public final class IShuaRedisCacheConstants {
         return TASK_IMPORT_LOCK_PREFIX + taskId;
     }
 
-    // ==================== AI 解答任务系统 Key（阶段 2，物理隔离） ====================
+    // ==================== AI 解答任务系统 Key ====================
 
-    /** 解答任务 Redis Stream（独立于阶段 1）。 */
+    /** 解答任务 Redis Stream */
     public static final String ANSWER_STREAM_KEY = "ishua:answer:stream";
 
-    /** 解答任务 Stream 消费组（独立进程）。 */
+    /** 解答任务 Stream 消费组 */
     public static final String ANSWER_STREAM_GROUP = "ishua-answer-workers";
 
-    /** Stream 最大长度（条）。 */
+    /** Stream 最大长度 */
     public static final long ANSWER_STREAM_MAX_LEN = 1000;
 
     /** 解答任务状态 Key 前缀：{@code ishua:answer:status:{answerTaskId}}。 */

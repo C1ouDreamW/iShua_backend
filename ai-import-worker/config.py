@@ -69,7 +69,7 @@ class Settings:
     )
     skip_llm: bool = _get_bool("SKIP_LLM", False)
 
-    # ---- 阶段 2：AI 解答独立流程（answer_worker） ----
+    # ---- AI 解答独立流程（answer_worker） ----
     answer_redis_stream: str = os.getenv("ANSWER_REDIS_STREAM", "ishua:answer:stream")
     answer_redis_group: str = os.getenv("ANSWER_REDIS_GROUP", "ishua-answer-workers")
     answer_redis_consumer: str = os.getenv("ANSWER_REDIS_CONSUMER", "answer_worker_1")
@@ -96,7 +96,7 @@ class Settings:
             raise ValueError("LLM_API_KEY is required (or set SKIP_LLM=true to skip LLM)")
 
     def validate_answer(self) -> None:
-        """阶段 2 answer_worker 启动校验：仅需 LLM，不需要 MinerU。"""
+        """ answer_worker 启动校验：仅需 LLM，不需要 MinerU。"""
         if not self.llm_api_key:
             raise ValueError("LLM_API_KEY is required for answer_worker")
         if self.answer_shard_size <= 0:

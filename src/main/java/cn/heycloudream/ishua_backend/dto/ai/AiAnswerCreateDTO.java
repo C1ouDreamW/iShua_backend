@@ -7,7 +7,7 @@ import lombok.Data;
 import java.util.List;
 
 /**
- * AI 解答任务创建请求（阶段 2）。
+ * AI 解答任务创建请求。
  * <p>
  * 二选一：指定题目下标列表，或使用 filter=MISSING 自动筛选所有无答案客观题。
  * 同时指定时以 questionIndices 为准。

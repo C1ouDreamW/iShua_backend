@@ -5,7 +5,7 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Mapper;
 
 /**
- * AI 解答任务 Mapper（阶段 2）。
+ * AI 解答任务 Mapper。
  *
  * @author C1ouD
  */

@@ -1,4 +1,4 @@
-"""阶段 2 AI 解答 Worker 主循环（独立进程，与 worker.py 物理隔离）。
+"""AI 解答 Worker 主循环。
 
 启动：python -m answer_worker
 
@@ -13,8 +13,8 @@ import sys
 import time
 from typing import Any, Dict, List, Optional
 
-from answer_generator import AnswerGenerator
-from answer_redis_manager import AnswerRedisManager
+from pipeline_answer.answer_generator import AnswerGenerator
+from pipeline_answer.answer_redis_manager import AnswerRedisManager
 from config import settings
 
 

@@ -32,7 +32,7 @@ import java.util.Optional;
 import java.util.Set;
 
 /**
- * AI 解答业务编排实现（阶段 2）。
+ * AI 解答业务编排实现。
  *
  * @author C1ouD
  */

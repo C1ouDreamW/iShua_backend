@@ -14,7 +14,7 @@ import java.time.Duration;
 import java.util.Optional;
 
 /**
- * 管理 {@code ishua:answer:status:{answerTaskId}} 的读写（阶段 2）。
+ * 管理 {@code ishua:answer:status:{answerTaskId}} 的读写。
  * <p>
  * 含终态 CAS 保护：ANSWERED/PARTIAL 写入后，PROCESSING 不能覆盖；
  * IMPORTED/FAILED 写入后，任何状态都不能覆盖。

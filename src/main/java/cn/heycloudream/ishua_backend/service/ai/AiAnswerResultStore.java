@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * 管理 {@code ishua:answer:result:{answerTaskId}} 的读写（阶段 2）。
+ * 管理 {@code ishua:answer:result:{answerTaskId}} 的读写。
  * <p>
  * 存储 LLM 解答后的题目列表（含 answerSource=AI_GENERATED 与 answerConfidence）。
  * </p>

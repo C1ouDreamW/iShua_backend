@@ -13,7 +13,7 @@ import java.time.Duration;
 import java.util.Optional;
 
 /**
- * 管理 {@code ishua:answer:meta:{answerTaskId}} 的读写（阶段 2）。
+ * 管理 {@code ishua:answer:meta:{answerTaskId}} 的读写。
  *
  * @author C1ouD
  */

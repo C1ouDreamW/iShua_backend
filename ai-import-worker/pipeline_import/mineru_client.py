@@ -12,7 +12,7 @@ import requests
 from tenacity import retry, retry_if_exception_type, stop_after_attempt, wait_exponential
 
 from config import settings
-from debug_artifacts import save_debug_bytes
+from shared.debug_artifacts import save_debug_bytes
 
 
 logger = logging.getLogger(__name__)
@@ -53,16 +53,6 @@ class MinerUClient:
         return self._extract_local(path, task_id, debug_dir=debug_dir)
 
     @staticmethod
-    #def _resolve_local_path(file_url: str) -> Path:
-    #    """解析 Java LocalFileStorageService 返回的 file:// 路径。"""
-    #    if file_url.startswith("file://"):
-    #        parsed = urlparse(file_url)
-    #        path_str = unquote(parsed.path or "")
-    #        # Windows: file:///D:/path -> /D:/path -> D:/path
-    #        if len(path_str) >= 3 and path_str[0] == "/" and path_str[2] == ":":
-    #            path_str = path_str[1:]
-    #        return Path(path_str)
-    #    return Path(file_url)
     def _resolve_local_path(file_url: str) -> Path:
         if file_url.startswith("file://"):
             # 移除 file:// 前缀

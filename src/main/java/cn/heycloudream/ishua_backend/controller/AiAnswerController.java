@@ -25,7 +25,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
- * AI 解答控制器（阶段 2）。
+ * AI 解答控制器。
  * <p>
  * 独立流程：用户在预览页确认导入任务含 MISSING 客观题后，可触发 AI 解答；
  * 解答结果由独立 Python Worker（{@code answer_worker.py}）异步生成。

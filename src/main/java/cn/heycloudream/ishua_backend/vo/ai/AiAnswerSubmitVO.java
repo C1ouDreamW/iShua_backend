@@ -7,7 +7,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 /**
- * AI 解答任务提交响应（阶段 2）。
+ * AI 解答任务提交响应。
  *
  * @author C1ouD
  */

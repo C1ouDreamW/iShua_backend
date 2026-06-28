@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 import java.util.List;
 
 /**
- * AI 解答任务元数据，写入 Redis 供消费者和 Watchdog 使用（阶段 2）。
+ * AI 解答任务元数据，写入 Redis 供消费者和 Watchdog 使用。
  *
  * @author C1ouD
  */

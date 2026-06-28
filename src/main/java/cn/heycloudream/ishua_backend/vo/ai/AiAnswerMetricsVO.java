@@ -7,7 +7,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 /**
- * AI 解答流水线指标（阶段 2）。
+ * AI 解答流水线指标。
  *
  * @author C1ouD
  */

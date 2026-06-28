@@ -1,6 +1,6 @@
-"""阶段 2 AI 解答任务专用 Redis 管理（独立 Stream / 消费组 / Key 前缀）。
+""" AI 解答任务专用 Redis 管理。
 
-与 redis_manager.py 物理隔离，互不影响阶段 1 抽题流程。
+与 redis_manager.py 物理隔离，互不影响。
 """
 from __future__ import annotations
 

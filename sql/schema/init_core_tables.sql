@@ -108,7 +108,7 @@ CREATE TABLE `wrong_question` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='wrong_question';
 
 -- ============================================
--- AI 解答任务表（阶段 2：AI 解答独立流程）
+-- AI 解答任务表
 -- 与 ai_import_task 通过 parent_task_id 关联
 -- ============================================
 CREATE TABLE `ai_answer_task` (

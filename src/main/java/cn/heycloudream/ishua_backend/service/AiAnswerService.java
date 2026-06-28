@@ -5,7 +5,7 @@ import cn.heycloudream.ishua_backend.vo.ai.AiAnswerSubmitVO;
 import cn.heycloudream.ishua_backend.vo.ai.AiAnswerTaskStatusVO;
 
 /**
- * AI 解答业务编排服务（阶段 2）。
+ * AI 解答业务编排服务。
  *
  * @author C1ouD
  */

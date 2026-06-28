@@ -8,13 +8,13 @@ from openai import OpenAI
 from tenacity import retry, stop_after_attempt, wait_exponential
 
 from config import settings
-from debug_artifacts import save_debug_text
-from question_preview import build_preview_list
+from shared.debug_artifacts import save_debug_text
+from pipeline_import.question_preview import build_preview_list
 
 
 logger = logging.getLogger(__name__)
 
-_PROMPTS_DIR = Path(__file__).resolve().parent / "prompts"
+_PROMPTS_DIR = Path(__file__).resolve().parent.parent / "prompts"
 _DEFAULT_SYSTEM_PROMPT_FILE = _PROMPTS_DIR / "ai-import-system.txt"
 
 _FALLBACK_SYSTEM_PROMPT = """你是「非结构化文本 → 结构化题库」解析引擎。
@@ -39,7 +39,7 @@ def _resolve_system_prompt_path() -> Path:
     if configured:
         path = Path(configured)
         if not path.is_absolute():
-            path = Path(__file__).resolve().parent / path
+            path = Path(__file__).resolve().parent.parent / path
         return path.resolve()
     return _DEFAULT_SYSTEM_PROMPT_FILE.resolve()
 

@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 import java.util.List;
 
 /**
- * AI 解答任务状态快照（阶段 2）。
+ * AI 解答任务状态快照。
  *
  * @author C1ouD
  */

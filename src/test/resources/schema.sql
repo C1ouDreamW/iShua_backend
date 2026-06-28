@@ -71,7 +71,7 @@ CREATE TABLE wrong_question (
 CREATE UNIQUE INDEX uk_user_question ON wrong_question (user_id, question_id);
 CREATE INDEX idx_user_create ON wrong_question (user_id, create_time);
 
--- AI 导入任务表（阶段 1）
+-- AI 导入任务表
 CREATE TABLE ai_import_task (
     id                   BIGINT       NOT NULL AUTO_INCREMENT PRIMARY KEY,
     task_id              VARCHAR(64)  NOT NULL,
@@ -100,7 +100,7 @@ CREATE UNIQUE INDEX uk_task_id ON ai_import_task (task_id, is_deleted);
 CREATE INDEX idx_user_status_time ON ai_import_task (user_id, status, submitted_at, is_deleted);
 CREATE INDEX idx_bank_status_time ON ai_import_task (bank_id, status, submitted_at, is_deleted);
 
--- AI 解答任务表（阶段 2）
+-- AI 解答任务表
 CREATE TABLE ai_answer_task (
     id              BIGINT       NOT NULL AUTO_INCREMENT PRIMARY KEY,
     answer_task_id  VARCHAR(64)  NOT NULL,

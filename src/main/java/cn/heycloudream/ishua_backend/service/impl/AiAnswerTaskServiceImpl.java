@@ -24,7 +24,7 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * AI 解答任务持久化服务实现（阶段 2）。
+ * AI 解答任务持久化服务实现。
  * <p>
  * 状态机：SUBMITTED → PROCESSING → ANSWERED/PARTIAL → IMPORTED；任意环节可 FAILED。
  * </p>

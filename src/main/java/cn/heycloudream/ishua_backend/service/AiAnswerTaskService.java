@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * AI 解答任务持久化服务（阶段 2）。
+ * AI 解答任务持久化服务。
  *
  * @author C1ouD
  */

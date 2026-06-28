@@ -14,9 +14,9 @@ import java.util.Collections;
 import java.util.Map;
 
 /**
- * 解答任务 Redis Stream 派发器（阶段 2，独立 Stream）。
+ * 解答任务 Redis Stream 派发器
  * <p>
- * 与 {@link RedisStreamTaskDispatcher} 物理隔离：不同 Stream、不同消费组，互不影响阶段 1。
+ * 与 {@link RedisStreamTaskDispatcher} 物理隔离：不同 Stream、不同消费组，互不影响。
  * </p>
  *
  * @author C1ouD
