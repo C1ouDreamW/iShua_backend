@@ -8,6 +8,12 @@
 SET NAMES utf8mb4;
 
 -- 清理旧压测数据
+DELETE aat
+FROM ai_answer_task aat
+JOIN ai_import_task ait ON ait.task_id = aat.parent_task_id
+JOIN bank_node qb ON qb.id = ait.bank_id
+WHERE qb.title LIKE '压测题库-%';
+
 DELETE ait
 FROM ai_import_task ait
 JOIN bank_node qb ON qb.id = ait.bank_id

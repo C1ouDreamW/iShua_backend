@@ -1,5 +1,6 @@
 SET NAMES utf8mb4;
 
+DROP TABLE IF EXISTS `ai_answer_task`;
 DROP TABLE IF EXISTS `wrong_question`;
 DROP TABLE IF EXISTS `question`;
 DROP TABLE IF EXISTS `ai_import_task`;
@@ -105,3 +106,32 @@ CREATE TABLE `wrong_question` (
   UNIQUE KEY `uk_user_question` (`user_id`, `question_id`),
   KEY `idx_user_create` (`user_id`, `create_time`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='wrong_question';
+
+-- ============================================
+-- AI 解答任务表（阶段 2：AI 解答独立流程）
+-- 与 ai_import_task 通过 parent_task_id 关联
+-- ============================================
+CREATE TABLE `ai_answer_task` (
+  `id`              BIGINT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'primary key',
+  `answer_task_id`  VARCHAR(64)     NOT NULL COMMENT 'answer business task id (uuid)',
+  `parent_task_id`  VARCHAR(64)     NOT NULL COMMENT 'related ai_import_task.task_id',
+  `user_id`         BIGINT UNSIGNED NOT NULL COMMENT 'submitter user id',
+  `bank_id`         BIGINT UNSIGNED NOT NULL COMMENT 'target LEAF node id',
+  `question_count`  INT UNSIGNED    NOT NULL COMMENT 'questions to answer (objective only)',
+  `answered_count`  INT UNSIGNED    DEFAULT 0 COMMENT 'successfully answered count',
+  `status`          VARCHAR(32)     NOT NULL COMMENT 'SUBMITTED/PROCESSING/ANSWERED/PARTIAL/FAILED/IMPORTED',
+  `answered_json`   LONGTEXT        DEFAULT NULL COMMENT 'answered QuestionPreviewVO[] json',
+  `error_message`   VARCHAR(500)    DEFAULT NULL COMMENT 'error message',
+  `llm_duration_ms` INT UNSIGNED    DEFAULT NULL COMMENT 'llm total duration ms',
+  `total_calls`     INT UNSIGNED    DEFAULT NULL COMMENT 'total llm calls (shards x votes)',
+  `submitted_at`    DATETIME        NOT NULL COMMENT 'submitted time',
+  `answered_at`     DATETIME        DEFAULT NULL COMMENT 'answered/partial time',
+  `imported_at`     DATETIME        DEFAULT NULL COMMENT 'imported time',
+  `create_time`     DATETIME        NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'create time',
+  `update_time`     DATETIME        NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'update time',
+  `is_deleted`      TINYINT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'logical delete flag',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uk_answer_task_id` (`answer_task_id`, `is_deleted`),
+  KEY `idx_parent` (`parent_task_id`, `is_deleted`),
+  KEY `idx_user_status` (`user_id`, `status`, `submitted_at`, `is_deleted`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='ai_answer_task';

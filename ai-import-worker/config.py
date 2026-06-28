@@ -69,11 +69,40 @@ class Settings:
     )
     skip_llm: bool = _get_bool("SKIP_LLM", False)
 
+    # ---- 阶段 2：AI 解答独立流程（answer_worker） ----
+    answer_redis_stream: str = os.getenv("ANSWER_REDIS_STREAM", "ishua:answer:stream")
+    answer_redis_group: str = os.getenv("ANSWER_REDIS_GROUP", "ishua-answer-workers")
+    answer_redis_consumer: str = os.getenv("ANSWER_REDIS_CONSUMER", "answer_worker_1")
+    answer_redis_block_ms: int = _get_int("ANSWER_REDIS_BLOCK_MS", 5000)
+
+    answer_status_ttl_seconds: int = _get_int("ANSWER_STATUS_TTL_SECONDS", 3600)
+    answer_result_ttl_seconds: int = _get_int("ANSWER_RESULT_TTL_SECONDS", 1800)
+    answer_heartbeat_interval_seconds: int = _get_int("ANSWER_HEARTBEAT_INTERVAL_SECONDS", 180)
+
+    answer_shard_size: int = _get_int("ANSWER_SHARD_SIZE", 10)
+    answer_vote_rounds: int = _get_int("ANSWER_VOTE_ROUNDS", 3)
+    answer_temperature: float = _get_float("ANSWER_TEMPERATURE", 0.4)
+    answer_llm_model: str = os.getenv("ANSWER_LLM_MODEL", "")  # 留空则复用 LLM_MODEL
+    answer_max_concurrency: int = _get_int("ANSWER_MAX_CONCURRENCY", 4)
+    answer_skip_short_answer: bool = _get_bool("ANSWER_SKIP_SHORT_ANSWER", True)
+    answer_llm_timeout_seconds: int = _get_int("ANSWER_LLM_TIMEOUT_SECONDS", 120)
+    # 解答专用系统提示词；留空则用 prompts/ai-answer-system.txt
+    answer_system_prompt_path: str = os.getenv("ANSWER_SYSTEM_PROMPT_PATH", "").strip()
+
     def validate(self) -> None:
         if not self.mineru_token:
             raise ValueError("MINERU_TOKEN is required")
         if not self.skip_llm and not self.llm_api_key:
             raise ValueError("LLM_API_KEY is required (or set SKIP_LLM=true to skip LLM)")
+
+    def validate_answer(self) -> None:
+        """阶段 2 answer_worker 启动校验：仅需 LLM，不需要 MinerU。"""
+        if not self.llm_api_key:
+            raise ValueError("LLM_API_KEY is required for answer_worker")
+        if self.answer_shard_size <= 0:
+            raise ValueError("ANSWER_SHARD_SIZE must be positive")
+        if self.answer_vote_rounds <= 0:
+            raise ValueError("ANSWER_VOTE_ROUNDS must be positive")
 
 
 settings = Settings()

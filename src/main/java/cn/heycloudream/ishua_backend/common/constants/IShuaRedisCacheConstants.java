@@ -100,6 +100,60 @@ public final class IShuaRedisCacheConstants {
         return TASK_IMPORT_LOCK_PREFIX + taskId;
     }
 
+    // ==================== AI 解答任务系统 Key（阶段 2，物理隔离） ====================
+
+    /** 解答任务 Redis Stream（独立于阶段 1）。 */
+    public static final String ANSWER_STREAM_KEY = "ishua:answer:stream";
+
+    /** 解答任务 Stream 消费组（独立进程）。 */
+    public static final String ANSWER_STREAM_GROUP = "ishua-answer-workers";
+
+    /** Stream 最大长度（条）。 */
+    public static final long ANSWER_STREAM_MAX_LEN = 1000;
+
+    /** 解答任务状态 Key 前缀：{@code ishua:answer:status:{answerTaskId}}。 */
+    private static final String ANSWER_STATUS_PREFIX = "ishua:answer:status:";
+
+    /** 解答任务结果 Key 前缀：{@code ishua:answer:result:{answerTaskId}}。 */
+    private static final String ANSWER_RESULT_PREFIX = "ishua:answer:result:";
+
+    /** 解答任务元数据 Key 前缀：{@code ishua:answer:meta:{answerTaskId}}。 */
+    private static final String ANSWER_META_PREFIX = "ishua:answer:meta:";
+
+    /** 解答任务入库幂等锁 Key 前缀：{@code ishua:answer:import_lock:{answerTaskId}}。 */
+    private static final String ANSWER_IMPORT_LOCK_PREFIX = "ishua:answer:import_lock:";
+
+    /** 解答任务状态 TTL（秒）：1 小时。 */
+    public static final int ANSWER_STATUS_TTL_SECONDS = 3600;
+
+    /** 解答任务结果 TTL（秒）：30 分钟。 */
+    public static final int ANSWER_RESULT_TTL_SECONDS = 1800;
+
+    /** 解答任务元数据 TTL（秒）：1 小时。 */
+    public static final int ANSWER_META_TTL_SECONDS = 3600;
+
+    /** 解答入库幂等锁 TTL（秒）：5 分钟。 */
+    public static final int ANSWER_IMPORT_LOCK_TTL_SECONDS = 300;
+
+    /** 解答任务 Watchdog 扫描锁。 */
+    public static final String ANSWER_WATCHDOG_LOCK_KEY = "ishua:answer:watchdog:lock";
+
+    public static String answerStatusKey(String answerTaskId) {
+        return ANSWER_STATUS_PREFIX + answerTaskId;
+    }
+
+    public static String answerResultKey(String answerTaskId) {
+        return ANSWER_RESULT_PREFIX + answerTaskId;
+    }
+
+    public static String answerMetaKey(String answerTaskId) {
+        return ANSWER_META_PREFIX + answerTaskId;
+    }
+
+    public static String answerImportLockKey(String answerTaskId) {
+        return ANSWER_IMPORT_LOCK_PREFIX + answerTaskId;
+    }
+
     // ==================== 注册邮箱验证码 Key ====================
 
     private static final String REGISTER_EMAIL_CODE_PREFIX = "ishua:register:email_code:";
