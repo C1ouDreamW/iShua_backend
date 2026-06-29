@@ -5,6 +5,7 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional
 
 from openai import OpenAI
+from json_repair import repair_json
 from tenacity import retry, stop_after_attempt, wait_exponential
 
 from config import settings
@@ -133,7 +134,13 @@ class LLMClient:
 
         # 清除 JSON 标准不允许的控制字符（\x00-\x1f 中除 \n \r \t 外）
         cleaned = re.sub(r"[\x00-\x08\x0b\x0c\x0e-\x1f\x7f]", "", cleaned)
-        data = json.loads(cleaned)
+        try:
+            data = json.loads(cleaned)
+        except json.JSONDecodeError as exc:
+            logger.warning(
+                "Standard JSON parse failed (%s); falling back to json_repair", exc
+            )
+            data = json.loads(repair_json(cleaned))
         if not isinstance(data, list):
             raise ValueError("LLM result must be a JSON array")
         return data
