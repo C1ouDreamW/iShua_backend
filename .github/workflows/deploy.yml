@@ -42,4 +42,4 @@ jobs:
 
       - name: Restart Service
         run: |
-          ssh root@heycloudream.cn "mv /opt/ishua/backend/app.jar.new /opt/ishua/backend/app.jar && systemctl restart ishua-backend && sleep 10 && systemctl is-active ishua-backend && curl -s -o /dev/null -w '%{http_code}' http://127.0.0.1:8080/actuator/health"
+          ssh root@heycloudream.cn "mv /opt/ishua/backend/app.jar.new /opt/ishua/backend/app.jar && systemctl restart ishua-backend && for i in \$(seq 1 15); do sleep 2; if curl -s -o /dev/null -w '%{http_code}' http://127.0.0.1:8080/actuator/health | grep -q 200; then echo 'OK'; exit 0; fi; done; echo 'FAIL'; exit 1"
