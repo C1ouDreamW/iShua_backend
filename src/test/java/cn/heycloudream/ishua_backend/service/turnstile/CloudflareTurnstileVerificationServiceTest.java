@@ -29,6 +29,7 @@ class CloudflareTurnstileVerificationServiceTest {
         ReflectionTestUtils.setField(service, "httpClient", httpClient);
         ReflectionTestUtils.setField(service, "secretKey", "test-secret");
         ReflectionTestUtils.setField(service, "expectedHostname", "");
+        ReflectionTestUtils.setField(service, "enabled", true);
     }
 
     @Test

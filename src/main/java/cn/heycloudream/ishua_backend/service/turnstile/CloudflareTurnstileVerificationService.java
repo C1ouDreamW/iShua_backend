@@ -38,8 +38,15 @@ public class CloudflareTurnstileVerificationService implements TurnstileVerifica
     @Value("${TURNSTILE_EXPECTED_HOSTNAME:}")
     private String expectedHostname;
 
+    @Value("${ishua.turnstile.enabled:true}")
+    private boolean enabled;
+
     @Override
     public void verifyRegisterEmailCode(String token, String remoteIp) {
+        if (!enabled) {
+            log.info("Turnstile 验证已关闭，跳过校验");
+            return;
+        }
         if (secretKey == null || secretKey.isBlank()) {
             throw new BusinessException(500, "人机验证服务未配置");
         }

@@ -1,0 +1,45 @@
+name: Deploy
+
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    name: Build & Deploy to Server
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+          cache: maven
+
+      - name: Build with Maven
+        run: |
+          chmod +x mvnw
+          ./mvnw -B package -DskipTests
+
+      - name: Setup SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+          ssh-keyscan -H heycloudream.cn >> ~/.ssh/known_hosts
+
+      - name: Upload JAR
+        run: |
+          scp target/ishua-backend-*.jar root@heycloudream.cn:/opt/ishua/backend/app.jar.new
+
+      - name: Restart Service
+        run: |
+          ssh root@heycloudream.cn "mv /opt/ishua/backend/app.jar.new /opt/ishua/backend/app.jar && systemctl restart ishua-backend && sleep 10 && systemctl is-active ishua-backend && curl -s -o /dev/null -w '%{http_code}' http://127.0.0.1:8080/actuator/health"
