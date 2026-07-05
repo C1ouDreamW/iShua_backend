@@ -48,4 +48,4 @@ jobs:
 
       - name: Deploy to server
         run: |
-          ssh root@heycloudream.cn "cd /opt/ishua/ai-worker && docker-compose pull && docker-compose up -d && docker image prune -f"
+          ssh root@heycloudream.cn "cd /opt/ishua/ai-worker && docker-compose pull && docker-compose down && docker-compose up -d && docker image prune -f"
