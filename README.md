@@ -3,9 +3,12 @@
 iShua 是一个面向大学生复习场景的在线题库与刷题平台。项目使用 Spring Boot 提供题库、刷题和错题本等核心能力，并通过 Redis Stream 解耦 Java API 与 Python Worker，接入 MinerU 和 LLM API，实现 PDF、Word、TXT 文档的异步解析、结构化题目抽取、预览确认和批量入库。
 
 > 在线 Demo：https://ishua.heycloudream.cn
-> 演示视频：待补充
 > 后端代码：当前仓库
 > 核心技术：Java 17、Spring Boot、MySQL、Redis、Redis Stream、Python、MinerU、LLM API
+
+## AI 导题演示
+
+<video controls src="https://github.com/user-attachments/assets/76062be1-5903-482d-a4d3-205de3686fca"></video>
 
 ## 核心亮点
 
