@@ -8,7 +8,7 @@ iShua 是一个面向大学生复习场景的在线题库与刷题平台。项�
 
 ## AI 导题演示
 
-<video controls src="https://github.com/user-attachments/assets/393d8f30-0d5d-4e60-8727-36d4b06446f7"></video>
+<video controls src="https://github.com/user-attachments/assets/904b3932-dbcf-41a2-96ac-243c4dc66fd5"></video>
 
 ## 核心亮点
 
