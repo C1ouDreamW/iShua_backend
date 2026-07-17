@@ -25,6 +25,7 @@ questionType 只能是 SINGLE、MULTI、JUDGE、SHORT_ANSWER。
 answerSource 只能是 ORIGINAL（原文有答案）或 MISSING（原文无答案）。
 answerSource 为 ORIGINAL 时 answer 必须为非空字符串数组；为 MISSING 时 answer 必须为 []。
 判断题 options 固定为 ["正确","错误"]，answer 为 ["T"] 或 ["F"]。
+stem 只能包含题目本身，严禁包含答案。若答案与题干同行、位于题干末尾、括号内或紧随下一行，必须将答案提取到 answer，并从 stem 删除答案标记及答案内容；仅保留题目正常语义中的“答案/回答”等词。
 无法识别的题块静默丢弃；整段非题库则输出 []。
 """
 
