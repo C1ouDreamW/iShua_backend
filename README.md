@@ -1,56 +1,82 @@
-# iShua - 智能在线题库与刷题平台
+<div align="center">
 
-iShua 是一个面向大学生复习场景的在线题库与刷题平台。项目使用 Spring Boot 提供题库、刷题和错题本等核心能力，并通过 Redis Stream 解耦 Java API 与 Python Worker，接入 MinerU 和 LLM API，实现 PDF、Word、TXT 文档的异步解析、结构化题目抽取、预览确认和批量入库。
+# iShua
 
-> 在线 Demo：https://ishua.heycloudream.cn
-> 后端代码：当前仓库
-> 核心技术：Java 17、Spring Boot、MySQL、Redis、Redis Stream、Python、MinerU、LLM API
+### AI 驱动的智能题库与刷题平台
+
+把 PDF、Word、TXT 中的题目变成可编辑、可练习、可复习的在线题库。
+
+<p>
+  <a href="https://ishua.cloud"><img src="https://img.shields.io/badge/在线体验-ishua.cloud-6C63FF?style=for-the-badge&amp;logo=googlechrome&amp;logoColor=white" alt="在线体验"></a>
+  <a href="https://github.com/C1ouDreamW/iShua_backend/actions/workflows/ci.yml"><img src="https://img.shields.io/github/actions/workflow/status/C1ouDreamW/iShua_backend/ci.yml?branch=main&amp;style=for-the-badge&amp;label=CI&amp;logo=github" alt="CI"></a>
+</p>
+
+<p>
+  <a href="https://openjdk.org/"><img src="https://img.shields.io/badge/Java-17-ED8B00?style=flat-square&amp;logo=openjdk&amp;logoColor=white" alt="Java 17"></a>
+  <a href="https://spring.io/projects/spring-boot"><img src="https://img.shields.io/badge/Spring_Boot-3.5-6DB33F?style=flat-square&amp;logo=springboot&amp;logoColor=white" alt="Spring Boot 3.5"></a>
+  <a href="https://www.mysql.com/"><img src="https://img.shields.io/badge/MySQL-8.x-4479A1?style=flat-square&amp;logo=mysql&amp;logoColor=white" alt="MySQL 8"></a>
+  <a href="https://redis.io/"><img src="https://img.shields.io/badge/Redis-Stream_+_Cache-DC382D?style=flat-square&amp;logo=redis&amp;logoColor=white" alt="Redis"></a>
+  <a href="https://www.python.org/"><img src="https://img.shields.io/badge/Python-3.10+-3776AB?style=flat-square&amp;logo=python&amp;logoColor=white" alt="Python 3.10+"></a>
+</p>
+
+[在线体验](https://ishua.cloud) · [快速开始](#快速开始) · [API 文档](docs/API.md) · [部署指南](docs/DEPLOYMENT.md)
+
+</div>
+
+---
+
+iShua 面向大学生备考与日常复习场景。当前仓库包含 **Spring Boot 后端 API** 与 **Python AI Worker**：前者负责用户、题库、刷题和错题本等业务，后者通过 MinerU 与 LLM 完成文档解析、题目抽取和智能解答。
+
+## 核心能力
+
+| 能力 | 说明 |
+| --- | --- |
+| **文档智能导题** | 支持 PDF、DOCX、TXT；异步解析并抽取为标准化题目，预览确认后再批量入库。 |
+| **AI 智能解答** | 对缺少答案的客观题进行分片、多轮投票解答，返回答案置信度供用户复核。 |
+| **树形题库管理** | 通过 `FOLDER / LEAF` 模型组织任意深度题库，支持公开大厅与个人题库。 |
+| **刷题复习闭环** | 支持顺序或随机刷题、服务端判分、错题自动归档与错题重刷。 |
+| **异步与缓存** | Redis Stream 解耦耗时 AI 任务；Redis Cache-Aside 加速公开热点题库读取。 |
+| **权限与数据隔离** | JWT 登录态、角色权限与资源归属校验共同保护用户数据。 |
 
 ## AI 导题演示
 
-<video controls src="https://github.com/user-attachments/assets/904b3932-dbcf-41a2-96ac-243c4dc66fd5"></video>
+<div align="center">
 
-## 核心亮点
+<video controls src="https://github.com/user-attachments/assets/3e4c1bb7-4419-4b02-8250-91ffbd6fa605"></video>
 
-### 1. 多模态文档智能导题
+上传文档 → 异步解析 → 题目预览 → 人工确认 → 批量入库
 
-用户上传 PDF、Word 或 TXT 文件后，Java API 创建导入任务并写入 Redis Stream。Python Worker 消费任务，调用 MinerU 将非结构化文档解析为 Markdown，再通过 LLM API 将内容抽取为标准化题目数据。解析结果不会直接落库，而是先进入预览确认流程，降低异常格式影响正式题库的风险。
+</div>
 
-### 2. Redis Stream 异步任务解耦
-
-文档解析和 LLM 调用属于长耗时任务。项目将 Java API 与 Python Worker 解耦：HTTP 请求仅负责校验文件、创建任务和异步派发，前端通过任务状态接口轮询处理进度，避免第三方调用阻塞请求线程。
-
-### 3. Redis 热点题库缓存
-
-针对公开题库的高频读取场景，使用 Redis 缓存题库详情和试题列表，并采用 Cache-Aside 模式维护缓存一致性：查询时优先读取缓存，数据更新后主动删除缓存，降低重复查询 MySQL 的开销。
-
-### 4. 刷题与错题本闭环
-
-平台支持题库分页、随机刷题、服务端判分、错题自动归档、错题移除和错题重刷。刷题列表默认不返回答案与解析，用户提交答案后才返回判分结果。
-
-### 5. 权限与数据隔离
-
-基于 JWT、拦截器和用户上下文完成登录态校验，并在题库管理接口中校验资源归属关系，避免用户越权操作其他用户的题库。
+> 如果视频无法直接播放，可以[点击这里查看演示](https://github.com/user-attachments/assets/3e4c1bb7-4419-4b02-8250-91ffbd6fa605)。
 
 ## 系统架构
 
 ```mermaid
 flowchart LR
-    A[用户上传文件] --> B[Spring Boot API]
-    B --> C[(Redis Stream)]
-    C --> D[Python Worker]
-    D --> E[MinerU]
-    E --> F[LLM API]
-    F --> G[(Redis 任务状态)]
-    G --> H[前端预览确认]
-    H --> I[(MySQL 批量入库)]
+    U[浏览器] -->|REST API| API[Spring Boot API]
 
-    J[用户刷题] --> K[题库与刷题 API]
-    K --> L[(Redis Cache)]
-    K --> M[(MySQL)]
+    API --> AUTH[JWT / 权限校验]
+    API --> DB[(MySQL)]
+    API <-->|热点题库| CACHE[(Redis Cache)]
+
+    API -->|投递 AI 任务| STREAM[(Redis Stream)]
+    STREAM --> IMPORT[导题 Worker]
+    STREAM --> ANSWER[解答 Worker]
+    IMPORT --> MINERU[MinerU]
+    IMPORT --> LLM[LLM API]
+    ANSWER --> LLM
+
+    IMPORT -->|状态 / 预览| REDIS[(Redis Task Store)]
+    ANSWER -->|答案 / 置信度| REDIS
+    API <--> REDIS
+    API -->|用户确认入库| DB
 ```
 
-## AI 导题流程
+AI 调用在独立 Worker 中执行，HTTP 请求只负责校验、创建任务与返回 `taskId`。前端轮询任务状态，并在预览页确认结果后再写入正式题库，避免长耗时调用阻塞接口，也降低异常解析结果污染题库的风险。
+
+<details>
+<summary><strong>查看 AI 导题时序</strong></summary>
 
 ```mermaid
 sequenceDiagram
@@ -58,72 +84,112 @@ sequenceDiagram
     participant J as Java API
     participant R as Redis Stream
     participant P as Python Worker
-    participant M as MinerU
-    participant L as LLM API
+    participant M as MinerU / LLM
     participant DB as MySQL
 
-    U->>J: 上传 PDF / Word / TXT
-    J->>R: 创建任务并写入 Stream
+    U->>J: 上传 PDF / DOCX / TXT
+    J->>R: 创建并投递任务
     J-->>U: 返回 taskId
     P->>R: 消费任务
-    P->>M: 解析文档
-    M-->>P: 返回 Markdown
-    P->>L: 抽取结构化题目
-    L-->>P: 返回 JSON
-    P->>R: 更新任务状态与预览结果
-    U->>J: 查询任务状态并确认导入
-    J->>DB: 批量写入题目
+    P->>M: 解析文档并抽取题目
+    M-->>P: 返回结构化结果
+    P->>R: 写入状态与预览数据
+    U->>J: 轮询状态并确认导入
+    J->>DB: 幂等批量入库
 ```
 
-## Demo 全栈架构
+</details>
 
-```mermaid
-flowchart LR
-    U[浏览器用户] --> W[Demo 前端站点]
-    W -->|HTTPS / REST API| A[Spring Boot 后端 API]
+## 技术栈
 
-    A -->|JWT 登录态校验| AUTH[用户与权限模块]
-    A -->|题库 / 试题 / 错题本 CRUD| DB[(MySQL)]
-    A -->|公开题库热点缓存| RC[(Redis Cache)]
-    A -->|AI 导题任务投递| RS[(Redis Stream)]
+| 层级 | 技术 |
+| --- | --- |
+| API 服务 | Java 17、Spring Boot 3.5、Spring MVC、Spring Validation |
+| 数据访问 | MyBatis-Plus、MySQL 8 |
+| 异步与缓存 | Redis Stream、Redis Cache-Aside |
+| AI Worker | Python 3.10+、MinerU、OpenAI-compatible LLM API |
+| 安全与文档 | JWT、BCrypt、Cloudflare Turnstile、SpringDoc OpenAPI |
+| 测试与交付 | JUnit 5、H2、Testcontainers、GitHub Actions |
 
-    RS --> PW[Python AI Worker]
-    PW --> MU[MinerU 文档解析]
-    PW --> LLM[LLM 题目抽取]
-    PW -->|任务状态 / 预览结果| RT[(Redis 任务缓存)]
+## 快速开始
 
-    W -->|轮询 taskId| A
-    A -->|读取 / 同步任务状态| RT
-    W -->|预览确认导入| A
-    A -->|批量写入正式题库| DB
-```
+### 1. 准备环境
 
-Demo 中，前端只与 Spring Boot 后端通过 REST API 通信。普通题库、刷题和错题本请求由后端直接访问 MySQL，并对公开热点题库使用 Redis 缓存；AI 导题请求则先由后端创建任务并写入 Redis Stream，再由 Python Worker 异步完成 MinerU 解析和 LLM 抽题。前端通过 taskId 轮询任务状态，拿到预览题目后确认导入，后端再将题目批量写入正式题库。
+- JDK 17+
+- MySQL 8.x
+- Redis 6.x+
+- Python 3.10+（仅 AI 导题与 AI 解答需要）
 
-## 关键代码导航
-
-| 能力               | 代码位置                               |
-| ---------------- | ---------------------------------- |
-| AI 导题任务派发与状态管理   | `src/main/java/.../service/ai/`    |
-| Python AI Worker | `ai-import-worker/`                |
-| JWT 与用户上下文       | `src/main/java/.../util/`          |
-| 题库访问校验           | `src/main/java/.../service/guard/` |
-| Redis 缓存逻辑       | `src/main/java/.../service/impl/`  |
-| 数据库初始化脚本         | `sql/schema/`                      |
-| 测试代码             | `src/test/`                        |
-
-## 快速启动
+### 2. 启动 Java API
 
 ```bash
-git clone https://github.com/C1ouDreamW/atlas.git
-cd atlas
-mvn clean test
-mvn spring-boot:run
+git clone https://github.com/C1ouDreamW/iShua_backend.git
+cd iShua_backend
+
+# 创建本地开发配置，并按注释填写数据库、Redis、JWT 等信息
+cp src/main/resources/application-dev.example.yaml \
+   src/main/resources/application-dev.yaml
+
+# 先创建 ishua_backend 数据库，再初始化表结构
+mysql -u root -p ishua_backend < sql/schema/init_core_tables.sql
+
+./mvnw spring-boot:run
 ```
 
-完整环境变量、MySQL 初始化方式和 Python Worker 启动说明见：
+Windows 用户可将 `cp` 替换为 `copy`，并使用 `mvnw.cmd spring-boot:run`。服务启动后访问：
 
-* `docs/DEPLOYMENT.md`
-* `docs/API.md`
-* `docs/AI_IMPORT_FLOW.md`
-* `docs/TESTING.md`
+- Swagger UI：<http://localhost:8080/swagger-ui.html>
+- OpenAPI JSON：<http://localhost:8080/v3/api-docs>
+
+### 3. 启动 AI Worker（可选）
+
+```bash
+cd ai-import-worker
+python -m venv .venv
+
+# Linux / macOS
+source .venv/bin/activate
+
+pip install -r requirements.txt
+cp .env.example .env
+# 在 .env 中填写 Redis、MinerU 与 LLM 配置
+python main.py
+```
+
+Java API 与 Worker 必须连接同一个 Redis，并能访问同一个上传文件目录。Windows 启动方式及完整环境变量请参考[部署指南](docs/DEPLOYMENT.md)。
+
+## 项目结构
+
+```text
+.
+├── src/main/java/       # Spring Boot 业务代码
+├── src/main/resources/  # 应用配置模板
+├── ai-import-worker/    # AI 导题与 AI 解答 Worker
+├── sql/schema/          # 数据库初始化脚本
+├── src/test/            # 单元测试与集成测试
+└── docs/                # API、流程、部署与测试文档
+```
+
+| 想了解的内容 | 文档 |
+| --- | --- |
+| 接口契约与调用方式 | [API 文档](docs/API.md) |
+| AI 文档导题链路 | [AI 导题流程](docs/AI_IMPORT_FLOW.md) |
+| AI 智能解答链路 | [AI 解答流程](docs/AI_ANSWER_FLOW.md) |
+| 本地与生产部署 | [部署指南](docs/DEPLOYMENT.md) |
+| 测试策略与运行方式 | [测试指南](docs/TESTING.md) |
+
+## 测试
+
+```bash
+./mvnw test
+```
+
+提交和 Pull Request 会通过 GitHub Actions 自动运行 Maven 测试。
+
+---
+
+<div align="center">
+
+如果 iShua 对你有帮助，欢迎 Star，或提交 Issue / Pull Request。
+
+</div>
