@@ -48,4 +48,23 @@ jobs:
 
       - name: Deploy to server
         run: |
-          ssh root@heycloudream.cn "cd /opt/ishua/ai-worker && docker-compose pull && docker-compose down && docker-compose up -d && docker image prune -f"
+          ssh root@heycloudream.cn 'bash -se' <<'EOF'
+            cd /opt/ishua/ai-worker
+
+            for attempt in 1 2 3; do
+              if docker-compose pull; then
+                break
+              fi
+
+              if [ "$attempt" -eq 3 ]; then
+                echo "Failed to pull worker image after 3 attempts" >&2
+                exit 1
+              fi
+
+              echo "Image pull failed (attempt $attempt/3), retrying in 10 seconds..." >&2
+              sleep 10
+            done
+
+            docker-compose up -d --remove-orphans
+            docker image prune -f
+          EOF
