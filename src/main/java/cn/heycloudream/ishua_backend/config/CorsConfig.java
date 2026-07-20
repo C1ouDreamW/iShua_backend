@@ -1,24 +1,29 @@
 package cn.heycloudream.ishua_backend.config;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
 
-/**
- * 跨域配置：允许本地 Vite 前端（默认 http://localhost:5173）访问 API。
- */
+import java.util.Arrays;
+import java.util.List;
+
 @Configuration
 public class CorsConfig {
 
-    private static final String FRONTEND_ORIGIN = "http://localhost:5173";
+    @Value("${cors.allowed-origins:http://localhost:5173}")
+    private String allowedOrigins;
 
     @Bean
     public CorsFilter corsFilter() {
         CorsConfiguration config = new CorsConfiguration();
         config.setAllowCredentials(true);
-        config.addAllowedOrigin(FRONTEND_ORIGIN);
+
+        List<String> origins = Arrays.asList(allowedOrigins.split(","));
+        config.setAllowedOrigins(origins);
+
         config.addAllowedHeader(CorsConfiguration.ALL);
         config.addAllowedMethod(CorsConfiguration.ALL);
         config.setMaxAge(3600L);
