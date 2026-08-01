@@ -321,14 +321,17 @@ class AnswerGenerator:
     @retry(wait=wait_exponential(multiplier=1, min=2, max=20), stop=stop_after_attempt(2), reraise=True)
     def _call_llm(self, shard: List[Dict[str, Any]]) -> str:
         user_prompt = _build_user_prompt(shard)
-        response = self.client.chat.completions.create(
-            model=self.model,
-            temperature=self.temperature,
-            messages=[
+        kwargs: Dict[str, Any] = {
+            "model": self.model,
+            "temperature": self.temperature,
+            "messages": [
                 {"role": "system", "content": self.system_prompt},
                 {"role": "user", "content": user_prompt},
             ],
-        )
+        }
+        if settings.llm_json_mode:
+            kwargs["response_format"] = {"type": "json_object"}
+        response = self.client.chat.completions.create(**kwargs)
         content = response.choices[0].message.content
         if not content:
             raise ValueError("LLM returned empty content")

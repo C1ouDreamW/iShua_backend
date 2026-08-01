@@ -164,6 +164,7 @@ Worker 读取 `backend/ai-import-worker/.env` 或当前进程环境变量。常�
 | `LLM_BASE_URL` | `https://api.deepseek.com` | LLM API 地址 |
 | `LLM_MODEL` | `deepseek-chat` | LLM 模型 |
 | `LLM_TEMPERATURE` | `0.0` | 抽题温度 |
+| `LLM_JSON_MODE` | `true` | 是否启用 OpenAI 兼容 JSON 输出（`response_format=json_object`）；不支持的厂商设为 `false` |
 | `LLM_SYSTEM_PROMPT_PATH` | 空 | 自定义系统提示词路径 |
 | `LOG_LEVEL` | `INFO` | 日志级别 |
 | `DEBUG_MODE` | `false` | 是否保存调试产物 |

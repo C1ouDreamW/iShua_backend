@@ -57,6 +57,8 @@ class Settings:
     llm_model: str = os.getenv("LLM_MODEL", "deepseek-chat")
     llm_timeout_seconds: int = _get_int("LLM_TIMEOUT_SECONDS", 120)
     llm_temperature: float = _get_float("LLM_TEMPERATURE", 0.0)
+    # 启用 OpenAI 兼容的 JSON 输出模式（response_format=json_object）；不支持的厂商可设为 false
+    llm_json_mode: bool = _get_bool("LLM_JSON_MODE", True)
     # 相对路径以 ai-import-worker 目录为根；留空则用 prompts/ai-import-system.txt
     llm_system_prompt_path: str = os.getenv("LLM_SYSTEM_PROMPT_PATH", "").strip()
 

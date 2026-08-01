@@ -109,14 +109,17 @@ class LLMClient:
         return previews
 
     def _call_model(self, user_prompt: str) -> str:
-        response = self.client.chat.completions.create(
-            model=settings.llm_model,
-            temperature=settings.llm_temperature,
-            messages=[
+        kwargs: Dict[str, Any] = {
+            "model": settings.llm_model,
+            "temperature": settings.llm_temperature,
+            "messages": [
                 {"role": "system", "content": SYSTEM_PROMPT},
                 {"role": "user", "content": user_prompt},
             ],
-        )
+        }
+        if settings.llm_json_mode:
+            kwargs["response_format"] = {"type": "json_object"}
+        response = self.client.chat.completions.create(**kwargs)
         content = response.choices[0].message.content
         if not content:
             raise ValueError("LLM returned empty content")
