@@ -51,8 +51,15 @@ jobs:
           ssh root@heycloudream.cn 'bash -se' <<'EOF'
             cd /opt/ishua/ai-worker
 
+            # docker-compose v1（1.29.2）已与新版 Docker Engine 不兼容（报错 KeyError: 'ContainerConfig'）
+            # 这里确保使用 Docker Compose v2 插件，缺失时自动安装
+            if ! docker compose version >/dev/null 2>&1; then
+              sudo apt-get update
+              sudo apt-get install -y docker-compose-plugin
+            fi
+
             for attempt in 1 2 3; do
-              if docker-compose pull; then
+              if docker compose pull; then
                 break
               fi
 
@@ -65,6 +72,6 @@ jobs:
               sleep 10
             done
 
-            docker-compose up -d --remove-orphans
+            docker compose up -d --remove-orphans
             docker image prune -f
           EOF
