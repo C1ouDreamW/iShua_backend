@@ -155,9 +155,10 @@ public class BankNodeServiceImpl implements BankNodeService {
 
     @Override
     public PageResultVO<BankNodeVO> pagePublicRoots(PageRequestDTO query) {
-        List<BankNode> roots = new ArrayList<>(filterPublicRoots(listAllNodes()));
+        List<BankNode> allNodes = listAllNodes();
+        List<BankNode> roots = new ArrayList<>(filterPublicRoots(allNodes));
         roots.sort(rootComparator());
-        return paginateRoots(roots, query.getCurrent(), query.getPageSize(), listAllNodes());
+        return paginateRoots(roots, query.getCurrent(), query.getPageSize(), allNodes);
     }
 
     @Override
@@ -171,9 +172,10 @@ public class BankNodeServiceImpl implements BankNodeService {
 
     @Override
     public PageResultVO<BankNodeVO> pageMyRoots(Long currentUserId, PageRequestDTO query) {
-        List<BankNode> roots = new ArrayList<>(filterMineRoots(listAllByUser(currentUserId)));
+        List<BankNode> allNodes = listAllByUser(currentUserId);
+        List<BankNode> roots = new ArrayList<>(filterMineRoots(allNodes));
         roots.sort(rootComparator());
-        return paginateRoots(roots, query.getCurrent(), query.getPageSize(), listAllByUser(currentUserId));
+        return paginateRoots(roots, query.getCurrent(), query.getPageSize(), allNodes);
     }
 
     @Override
